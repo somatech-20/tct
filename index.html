@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>TB Case Tracer Management System</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    .mockup-phone {
+      border: 16px solid #333;
+      border-radius: 40px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      max-width: 320px;
+      margin: 0 auto;
+    }
+    .mockup-screen {
+      background: #f0f2f5;
+      padding: 16px;
+      border-radius: 12px;
+      height: 568px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .mockup-header {
+      background: #1e40af;
+      color: white;
+      padding: 8px 12px;
+      text-align: center;
+      font-weight: bold;
+      border-radius: 8px 8px 0 0;
+    }
+    .mockup-list {
+      flex: 1;
+      padding: 12px;
+      overflow-y: auto;
+    }
+    .mockup-item {
+      background: white;
+      margin-bottom: 10px;
+      padding: 10px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .feature-icon {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+    }
+    .diagram-container {
+      background: #fff;
+      padding: 1rem;
+      border-radius: 0.5rem;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      margin: 1rem 0;
+    }
+    .step-number {
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      width: 36px;
+      height: 36px;
+      background: #1e40af;
+      color: white;
+      border-radius: 50%;
+      font-weight: bold;
+      margin-right: 12px;
+    }
+    body {
+      scroll-behavior: smooth;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    .lang-toggle {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1000;
+    }
+    .lang-btn {
+      background: rgba(255,255,255,0.9);
+      border: 1px solid #ddd;
+      padding: 6px 12px;
+      margin: 2px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.85rem;
+    }
+    .lang-btn.active {
+      background: #1e40af;
+      color: white;
+    }
+  </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+  <!-- Language Toggle -->
+  <div class="lang-toggle">
+    <button class="lang-btn" data-lang="en">EN</button>
+    <button class="lang-btn active" data-lang="so">SO</button>
+    <button class="lang-btn" data-lang="ar">ع</button>
+  </div>
+
+  <!-- Hero Section -->
+  <header id="hero" class="bg-gradient-to-r from-blue-800 to-indigo-900 text-white py-16 px-4">
+    <div class="max-w-6xl mx-auto text-center">
+      <h1 class="text-4xl md:text-5xl font-bold mb-4" data-key="hero-title">
+        TB Case Tracer Management System
+      </h1>
+      <p class="text-lg md:text-xl max-w-3xl mx-auto" data-key="hero-desc">
+        A modern, offline-first digital solution to transform tuberculosis contact tracing and patient management in Somalia.
+      </p>
+      <div class="mt-8 flex justify-center gap-4">
+        <a href="#features" class="bg-white text-blue-800 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition" data-key="explore-btn">Explore Features</a>
+        <a href="#demo" class="bg-indigo-700 text-white px-6 py-3 rounded-lg font-semibold hover:bg-indigo-600 transition" data-key="view-demo-btn">View Demo</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Problem Statement -->
+  <section class="py-16 px-4 bg-white">
+    <div class="max-w-6xl mx-auto">
+      <h2 class="text-3xl font-bold text-center mb-10 text-gray-800" data-key="problem-title">The Challenge</h2>
+      <div class="grid md:grid-cols-2 gap-8 items-center">
+        <div>
+          <h3 class="text-xl font-semibold mb-4" data-key="paper-system">Paper-Based TB Tracing in Somalia</h3>
+          <ul class="space-y-3 text-gray-700">
+            <li class="flex items-start">
+              <i class="fas fa-times-circle text-red-500 mt-1 mr-2"></i>
+              <span data-key="loss">Data loss due to damaged or lost notebooks</span>
+            </li>
+            <li class="flex items-start">
+              <i class="fas fa-times-circle text-red-500 mt-1 mr-2"></i>
+              <span data-key="delays">Reporting delays of days or weeks</span>
+            </li>
+            <li class="flex items-start">
+              <i class="fas fa-times-circle text-red-500 mt-1 mr-2"></i>
+              <span data-key="no-realtime">No real-time visibility of outbreaks</span>
+            </li>
+            <li class="flex items-start">
+              <i class="fas fa-times-circle text-red-500 mt-1 mr-2"></i>
+              <span data-key="default">High risk of treatment default and drug resistance</span>
+            </li>
+            <li class="flex items-start">
+              <i class="fas fa-times-circle text-red-500 mt-1 mr-2"></i>
+              <span data-key="no-geo">No geolocation for hotspot identification</span>
+            </li>
+          </ul>
+        </div>
+        <div class="bg-gray-100 p-6 rounded-xl">
+          <img src="https://placehold.co/500x300/ef4444/white?text=Paper+TB+Forms" alt="Paper-based TB system" class="w-full rounded-lg">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Solution Overview -->
+  <section id="features" class="py-16 px-4 bg-gray-50">
+    <div class="max-w-6xl mx-auto">
+      <h2 class="text-3xl font-bold text-center mb-12 text-gray-800" data-key="solution-title">Our Digital Solution</h2>
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div class="bg-white p-6 rounded-xl shadow-md text-center">
+          <div class="feature-icon text-blue-600"><i class="fas fa-sync-alt"></i></div>
+          <h3 class="text-xl font-semibold mb-3" data-key="offline">Offline-First Design</h3>
+          <p data-key="offline-desc">Tracers work without internet. Data syncs automatically when connectivity is restored.</p>
+        </div>
+        <div class="bg-white p-6 rounded-xl shadow-md text-center">
+          <div class="feature-icon text-green-600"><i class="fas fa-map-marked-alt"></i></div>
+          <h3 class="text-xl font-semibold mb-3" data-key="geo">Geolocation Mapping</h3>
+          <p data-key="geo-desc">GPS-enabled contact tracing to identify TB hotspots and allocate resources efficiently.</p>
+        </div>
+        <div class="bg-white p-6 rounded-xl shadow-md text-center">
+          <div class="feature-icon text-purple-600"><i class="fas fa-bell"></i></div>
+          <h3 class="text-xl font-semibold mb-3" data-key="alerts">Automated Alerts</h3>
+          <p data-key="alerts-desc">Real-time reminders for missed doses and follow-ups to improve treatment adherence.</p>
+        </div>
+        <div class="bg-white p-6 rounded-xl shadow-md text-center">
+          <div class="feature-icon text-amber-600"><i class="fas fa-database"></i></div>
+          <h3 class="text-xl font-semibold mb-3" data-key="secure-db">Secure Patient Database</h3>
+          <p data-key="secure-db-desc">Role-based access to detailed case and contact records with encryption and privacy.</p>
+        </div>
+        <div class="bg-white p-6 rounded-xl shadow-md text-center">
+          <div class="feature-icon text-teal-600"><i class="fas fa-chart-line"></i></div>
+          <h3 class="text-xl font-semibold mb-3" data-key="dashboards">Real-Time Dashboards</h3>
+          <p data-key="dashboards-desc">Live monitoring of key indicators: cases, contacts screened, adherence rates, and more.</p>
+        </div>
+        <div class="bg-white p-6 rounded-xl shadow-md text-center">
+          <div class="feature-icon text-red-600"><i class="fas fa-mobile-alt"></i></div>
+          <h3 class="text-xl font-semibold mb-3" data-key="pwa">Mobile Web App</h3>
+          <p data-key="pwa-desc">No app store needed. Access directly via smartphone browser—low data, fast loading.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- System Architecture Diagram -->
+  <section class="py-16 px-4 bg-white">
+    <div class="max-w-6xl mx-auto">
+      <h2 class="text-3xl font-bold text-center mb-10 text-gray-800" data-key="arch-title">System Architecture</h2>
+      <div class="diagram-container">
+        <div class="flex flex-col md:flex-row justify-center items-center gap-6">
+          <div class="text-center p-4">
+            <div class="bg-blue-100 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-2">
+              <i class="fas fa-mobile-alt text-3xl text-blue-700"></i>
+            </div>
+            <p class="font-medium" data-key="arch-tracer">Field Tracer (Offline)</p>
+          </div>
+          <div class="text-3xl text-gray-400 hidden md:block">→</div>
+          <div class="text-center p-4">
+            <div class="bg-green-100 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-2">
+              <i class="fas fa-cloud text-3xl text-green-700"></i>
+            </div>
+            <p class="font-medium" data-key="arch-firebase">Firebase (Sync when online)</p>
+          </div>
+          <div class="text-3xl text-gray-400 hidden md:block">→</div>
+          <div class="text-center p-4">
+            <div class="bg-purple-100 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-2">
+              <i class="fas fa-laptop text-3xl text-purple-700"></i>
+            </div>
+            <p class="font-medium" data-key="arch-dashboard">Program Manager Dashboard</p>
+          </div>
+        </div>
+        <p class="text-center mt-6 text-gray-600" data-key="arch-desc">Built with React.js (PWA) + Firebase (Firestore + Auth) — optimized for Somalia’s mobile-first reality.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Mockup Demo -->
+  <section id="demo" class="py-16 px-4 bg-gray-50">
+    <div class="max-w-6xl mx-auto">
+      <h2 class="text-3xl font-bold text-center mb-12 text-gray-800" data-key="demo-title">App Screens Preview</h2>
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <!-- Login Screen -->
+        <div>
+          <h3 class="text-center font-semibold mb-3" data-key="login-title">Login</h3>
+          <div class="mockup-phone">
+            <div class="mockup-screen">
+              <div class="mockup-header" data-key="app-name">TB Case Tracer</div>
+              <div class="p-4 flex-1 flex flex-col justify-center">
+                <h4 class="font-bold mb-4 text-center" data-key="signin">Sign In</h4>
+                <div class="space-y-3">
+                  <input type="text" placeholder="Username" class="w-full p-2 border rounded" data-placeholder="username">
+                  <input type="password" placeholder="Password" class="w-full p-2 border rounded" data-placeholder="password">
+                  <button class="w-full bg-blue-600 text-white py-2 rounded" data-key="login-btn">Login</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Case Registration -->
+        <div>
+          <h3 class="text-center font-semibold mb-3" data-key="register-case">Register New Case</h3>
+          <div class="mockup-phone">
+            <div class="mockup-screen">
+              <div class="mockup-header" data-key="new-case">New TB Case</div>
+              <div class="mockup-list">
+                <div class="mockup-item">
+                  <label class="text-xs text-gray-600" data-key="name-label">Name</label>
+                  <p>Ahmed Hassan</p>
+                </div>
+                <div class="mockup-item">
+                  <label class="text-xs text-gray-600" data-key="address-label">Address</label>
+                  <p>Wadajir, Mogadishu</p>
+                </div>
+                <div class="mockup-item">
+                  <label class="text-xs text-gray-600" data-key="diag-date">Diagnosis Date</label>
+                  <p>05 Dec 2025</p>
+                </div>
+                <button class="mt-4 w-full bg-green-600 text-white py-2 rounded text-sm" data-key="save-btn">Save & Add Contacts</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Contact Tracing -->
+        <div>
+          <h3 class="text-center font-semibold mb-3" data-key="contact-tracing">Contact Tracing</h3>
+          <div class="mockup-phone">
+            <div class="mockup-screen">
+              <div class="mockup-header" data-key="contact-list">Contact List</div>
+              <div class="mockup-list">
+                <div class="mockup-item">
+                  <p class="font-medium">Fatima A.</p>
+                  <p class="text-xs" data-key="screened">Daughter | Screened ✅</p>
+                </div>
+                <div class="mockup-item">
+                  <p class="font-medium">Ali M.</p>
+                  <p class="text-xs" data-key="pending">Brother | Pending ⏳</p>
+                </div>
+                <div class="mockup-item">
+                  <p class="font-medium" data-key="new-contact">New Contact</p>
+                  <p class="text-xs text-blue-600" data-key="add-contact">+ Add Contact</p>
+                </div>
+                <button class="mt-4 w-full bg-blue-600 text-white py-2 rounded text-sm" data-key="sync-btn">Sync Now (Offline)</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Workflow Diagram -->
+  <section class="py-16 px-4 bg-white">
+    <div class="max-w-6xl mx-auto">
+      <h2 class="text-3xl font-bold text-center mb-10 text-gray-800" data-key="workflow-title">How It Works</h2>
+      <div class="space-y-6 max-w-3xl mx-auto">
+        <div class="flex items-start">
+          <span class="step-number">1</span>
+          <div>
+            <h3 class="font-bold" data-key="step1-title">TB Diagnosis</h3>
+            <p data-key="step1-desc">Clinician registers index case via web app or paper (digitized later).</p>
+          </div>
+        </div>
+        <div class="flex items-start">
+          <span class="step-number">2</span>
+          <div>
+            <h3 class="font-bold" data-key="step2-title">Assign Tracer</h3>
+            <p data-key="step2-desc">System auto-assigns a community health worker to the case.</p>
+          </div>
+        </div>
+        <div class="flex items-start">
+          <span class="step-number">3</span>
+          <div>
+            <h3 class="font-bold" data-key="step3-title">Field Visit (Offline)</h3>
+            <p data-key="step3-desc">Tracer visits household using mobile app—records contacts, symptoms, GPS location.</p>
+          </div>
+        </div>
+        <div class="flex items-start">
+          <span class="step-number">4</span>
+          <div>
+            <h3 class="font-bold" data-key="step4-title">Auto-Sync & Alerts</h3>
+            <p data-key="step4-desc">When online, data syncs to cloud. Missed doses trigger SMS/app alerts.</p>
+          </div>
+        </div>
+        <div class="flex items-start">
+          <span class="step-number">5</span>
+          <div>
+            <h3 class="font-bold" data-key="step5-title">Dashboard Insights</h3>
+            <p data-key="step5-desc">Program managers view real-time maps, adherence stats, and cluster alerts.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Impact & Scope -->
+  <section class="py-16 px-4 bg-gradient-to-r from-blue-700 to-indigo-800 text-white">
+    <div class="max-w-6xl mx-auto text-center">
+      <h2 class="text-3xl font-bold mb-8" data-key="somalia-title">Designed for Somalia</h2>
+      <div class="grid md:grid-cols-3 gap-8">
+        <div>
+          <h3 class="text-xl font-semibold mb-3" data-key="banaadir">📍 Banaadir Focus</h3>
+          <p data-key="banaadir-desc">Piloted in Mogadishu—Somalia’s highest TB burden zone with >70% smartphone penetration.</p>
+        </div>
+        <div>
+          <h3 class="text-xl font-semibold mb-3" data-key="privacy">🛡️ Privacy First</h3>
+          <p data-key="privacy-desc">Encrypted data, consent-based GPS, and role-based access ensure patient confidentiality.</p>
+        </div>
+        <div>
+          <h3 class="text-xl font-semibold mb-3" data-key="scalable">🚀 Scalable Platform</h3>
+          <p data-key="scalable-desc">Built to expand to other regions after successful pilot—zero infrastructure cost.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="bg-gray-900 text-white py-8 px-4">
+    <div class="max-w-6xl mx-auto text-center">
+      <p class="mb-2" data-key="footer-title">TB Case Tracer Management System</p>
+      <p class="text-gray-400" data-key="footer-thesis">A Graduation Thesis Project — Capital University of Somalia</p>
+      <p class="text-gray-400 mt-4">© 2025 Mehdi M. et al</p>
+    </div>
+  </footer>
+
+  <script>
+    const translations = {
+      en: {
+        "hero-title": "TB Case Tracer Management System",
+        "hero-desc": "A modern, offline-first digital solution to transform tuberculosis contact tracing and patient management in Somalia.",
+        "explore-btn": "Explore Features",
+        "view-demo-btn": "View Demo",
+        "problem-title": "The Challenge",
+        "paper-system": "Paper-Based TB Tracing in Somalia",
+        "loss": "Data loss due to damaged or lost notebooks",
+        "delays": "Reporting delays of days or weeks",
+        "no-realtime": "No real-time visibility of outbreaks",
+        "default": "High risk of treatment default and drug resistance",
+        "no-geo": "No geolocation for hotspot identification",
+        "solution-title": "Our Digital Solution",
+        "offline": "Offline-First Design",
+        "offline-desc": "Tracers work without internet. Data syncs automatically when connectivity is restored.",
+        "geo": "Geolocation Mapping",
+        "geo-desc": "GPS-enabled contact tracing to identify TB hotspots and allocate resources efficiently.",
+        "alerts": "Automated Alerts",
+        "alerts-desc": "Real-time reminders for missed doses and follow-ups to improve treatment adherence.",
+        "secure-db": "Secure Patient Database",
+        "secure-db-desc": "Role-based access to detailed case and contact records with encryption and privacy.",
+        "dashboards": "Real-Time Dashboards",
+        "dashboards-desc": "Live monitoring of key indicators: cases, contacts screened, adherence rates, and more.",
+        "pwa": "Mobile Web App",
+        "pwa-desc": "No app store needed. Access directly via smartphone browser—low data, fast loading.",
+        "arch-title": "System Architecture",
+        "arch-tracer": "Field Tracer (Offline)",
+        "arch-firebase": "Firebase (Sync when online)",
+        "arch-dashboard": "Program Manager Dashboard",
+        "arch-desc": "Built with React.js (PWA) + Firebase (Firestore + Auth) — optimized for Somalia’s mobile-first reality.",
+        "demo-title": "App Screens Preview",
+        "login-title": "Login",
+        "app-name": "TB Case Tracer",
+        "signin": "Sign In",
+        "username": "Username",
+        "password": "Password",
+        "login-btn": "Login",
+        "register-case": "Register New Case",
+        "new-case": "New TB Case",
+        "name-label": "Name",
+        "address-label": "Address",
+        "diag-date": "Diagnosis Date",
+        "save-btn": "Save & Add Contacts",
+        "contact-tracing": "Contact Tracing",
+        "contact-list": "Contact List",
+        "screened": "Daughter | Screened ✅",
+        "pending": "Brother | Pending ⏳",
+        "new-contact": "New Contact",
+        "add-contact": "+ Add Contact",
+        "sync-btn": "Sync Now (Offline)",
+        "workflow-title": "How It Works",
+        "step1-title": "TB Diagnosis",
+        "step1-desc": "Clinician registers index case via web app or paper (digitized later).",
+        "step2-title": "Assign Tracer",
+        "step2-desc": "System auto-assigns a community health worker to the case.",
+        "step3-title": "Field Visit (Offline)",
+        "step3-desc": "Tracer visits household using mobile app—records contacts, symptoms, GPS location.",
+        "step4-title": "Auto-Sync & Alerts",
+        "step4-desc": "When online, data syncs to cloud. Missed doses trigger SMS/app alerts.",
+        "step5-title": "Dashboard Insights",
+        "step5-desc": "Program managers view real-time maps, adherence stats, and cluster alerts.",
+        "somalia-title": "Designed for Somalia",
+        "banaadir": "📍 Banaadir Focus",
+        "banaadir-desc": "Piloted in Mogadishu—Somalia’s highest TB burden zone with >70% smartphone penetration.",
+        "privacy": "🛡️ Privacy First",
+        "privacy-desc": "Encrypted data, consent-based GPS, and role-based access ensure patient confidentiality.",
+        "scalable": "🚀 Scalable Platform",
+        "scalable-desc": "Built to expand to other regions after successful pilot—zero infrastructure cost.",
+        "footer-title": "TB Case Tracer Management System",
+        "footer-thesis": "A Graduation Thesis Project — Capital University of Somalia"
+      },
+      so: {
+        "hero-title": "Nidaamka Maareynta Kalsooniyeed ee Isku-dhaafsiinta Khaalfamada",
+        "hero-desc": "Furaha dijitalada cusub, oo aan internet laheyn, si loo bedelo isku-dhaafsiinta khaalfamada iyo maareynta mareynta Somalia.",
+        "explore-btn": "Akooyso Xusayn",
+        "view-demo-btn": "Eeg Tusmo",
+        "problem-title": "Dhibaato La Kulmay",
+        "paper-system": "Isku-dhaafsiinta khaalfamada wax-qor ah ee Somalia",
+        "loss": "Khadhibista xogta sababtoo ah kala qaban ama warqad la qaliyay",
+        "delays": "Dheer-bixinta warbixinta oo saacadood ama toddobaado",
+        "no-realtime": "Halkan ma jirto amniga oo dhacdooyin la arko",
+        "default": "Khatarta sare ee dhammada ilaa iibka iyo dhinaca dhaawacda",
+        "no-geo": "Gacanta goobta ah ma jiro si loo arooso barakadda",
+        "solution-title": "Furaha Dijitalada ee Anu Kusiiyey",
+        "offline": "Maamul La’aan Internet (Offline-First)",
+        "offline-desc": "Isku-dhaafsiyayaasha waxay shaqeyn karaan internet la’aan. Xogta wuxuu isku dhufan yahay markii xiriirka internet la aqbalo.",
+        "geo": "Sawir Xariirka Goobta (Geolocation)",
+        "geo-desc": "Isku-dhaafsiinta khaalfamada la fayl galay GPS si loo arooso barakadda iyo ku dhisan qoondeynta fursadaha.",
+        "alerts": "Ogeysiisyo Kooray",
+        "alerts-desc": "Xusuusin kooray oo dalka ah si loo hagaajiyo in ilaa la iibo ama la laabo soo dejinta.",
+        "secure-db": "Baanka Xogta Nafsan ah ee Mareynta",
+        "secure-db-desc": "Helitaanka ku habboon amaarka iyo xogta kalsooniyeedka oo la dhaqan gudbo.",
+        "dashboards": "Faallooyinka Wakiilka",
+        "dashboards-desc": "Maareynta amniga ah ee tirooyinka muhiimka ah: dhacdooyin, isku-dhaafsiinta, amniga ilaa",
+        "pwa": "Barnuugta Dijitalada ee Mobile-ka",
+        "pwa-desc": "Ma jirin barnuug qeybta ah (app store). Helitaanka barnuugta browser-ka mobile-ka — xog yar, dhibic aad u adag.",
+        "arch-title": "Xarunta Nidaamka",
+        "arch-tracer": "Isku-dhaafsiyayaasha (Offline)",
+        "arch-firebase": "Firebase (Isku-dhuf markii online yahay)",
+        "arch-dashboard": "Faallooyinka Maamulaha",
+        "arch-desc": "La sameeyay React.js (PWA) + Firebase (Firestore + Auth) — ayadoo la isku dhisay xaaladda mobile-ka ee Somalia.",
+        "demo-title": "Tusmooyinka Barnuugta",
+        "login-title": "Gal",
+        "app-name": "Isku-dhaafsiinta Khaalfamada",
+        "signin": "Gal",
+        "username": "Magaca isticmaalaha",
+        "password": "Erayga sirta ah",
+        "login-btn": "Gal",
+        "register-case": "Diiwaangelinta Khaalfamada Cusub",
+        "new-case": "Khaalfamad Cusub",
+        "name-label": "Magaca",
+        "address-label": "Ciwaan",
+        "diag-date": "Taariikhda Khaalfamada",
+        "save-btn": "Kaydi & Ku dar Isku-dhaafsiinta",
+        "contact-tracing": "Isku-dhaafsiinta",
+        "contact-list": "Liiska Isku-dhaafsiinta",
+        "screened": "Dameer | La isku-dhaafsay ✅",
+        "pending": "Walaalka | Sugitaan ⏳",
+        "new-contact": "Isku-dhaafsi leh Cusub",
+        "add-contact": "+ Ku dar Isku-dhaafsiinta",
+        "sync-btn": "Isku-dhuf Hadda (Offline)",
+        "workflow-title": "Sida Haliyaysto",
+        "step1-title": "Khaalfamada TB",
+        "step1-desc": "Daktarka diiwaangelinta khaalfamada aasaasiga ah (index) barnuugta ama qoraalka (marka la dijitalan yahay).",
+        "step2-title": "Ku Dar Isku-dhaafsiyaya",
+        "step2-desc": "Nidaamka si otomaatig ah u kordhaa shaqaalaha caafimaadka bulshada.",
+        "step3-title": "Booska (Offline)",
+        "step3-desc": "Isku-dhaafsiyayaasha booqda gurihii iyo barnuugta mobile — kaydinta isku-dhaafsiinta, caloolaha, iyo goobtan GPS.",
+        "step4-title": "Isku-dhufnaanta & Ogeysiisada",
+        "step4-desc": "Markii online yahay, xogta wuxuu isku dhufanayaa. Ilaa la iibo ama la laabo wuxuu u dirayaa ogeysiisyo SMS/app.",
+        "step5-title": "Faallooyinka Maamulada",
+        "step5-desc": "Maamuluhu aragaa sawirro, amniga ilaa, iyo ogeysiisyo barakadda.",
+        "somalia-title": "La Sameeyay Somalia",
+        "banaadir": "📍 Ciidda Banaadir",
+        "banaadir-desc": "La isku dayay Mogadishu — gobolka ugu sarreeya ee khaalfamada Somalia kaas oo >70% helitaanka mobile-ka.",
+        "privacy": "🛡️ Gaadhsiinta Macluumaadka",
+        "privacy-desc": "Xogta la dhaqan gudbo, GPS la ogolaaday, iyo helitaan ku habboon waxay nafsanaynaysaa macluumaadka mareynta.",
+        "scalable": "🚀 Nidaamka Ku Badan Karin",
+        "scalable-desc": "Waxaa loo sameeyay in lagu badiyo gobollada kale ka dib markii isku-dhismada waa guuldarada — xirfad la’aan nidaamka.",
+        "footer-title": "Nidaamka Maareynta Kalsooniyeed ee Isku-dhaafsiinta Khaalfamada",
+        "footer-thesis": "Wajiga Ciyaarta — Jaamacadda Caasimada ee Somalia (Capital University of Somalia)"
+      },
+      ar: {
+        "hero-title": "نظام تتبع حالات السل وإدارتها",
+        "hero-desc": "حل رقمي حديث يعمل دون اتصال بالإنترنت لتحويل تتبع اتصالات السل وإدارة المرضى في الصومال.",
+        "explore-btn": "استكشف الميزات",
+        "view-demo-btn": "عرض العرض التوضيحي",
+        "problem-title": "التحدي",
+        "paper-system": "تتبع السل الورقي في الصومال",
+        "loss": "فقدان البيانات بسبب دفاتر التالفة أو المفقودة",
+        "delays": "تأخير في إعداد التقارير لأيام أو أسابيع",
+        "no-realtime": "عدم وجود رؤية فورية لتفشي المرض",
+        "default": "خطر عالٍ لعدم الالتزام بالعلاج ومقاومة الأدوية",
+        "no-geo": "عدم وجود تحديد للموقع الجغرافي لتحديد البؤر الساخنة",
+        "solution-title": "حلنا الرقمي",
+        "offline": "تصميم يعمل دون اتصال",
+        "offline-desc": "يمكن للعاملين الميدانيين العمل دون اتصال، وتنسق البيانات تلقائيًا عند توفر الإنترنت.",
+        "geo": "رسم الخرائط الجغرافية",
+        "geo-desc": "تتبع الاتصالات باستخدام GPS لتحديد بؤر مرض السل وتوزيع الموارد بكفاءة.",
+        "alerts": "تنبيهات آلية",
+        "alerts-desc": "تذكيرات فورية عند تفويت الجرعات أو المواعيد لمتابعة العلاج.",
+        "secure-db": "قاعدة بيانات آمنة للمرضى",
+        "secure-db-desc": "وصول قائم على الأدوار مع تشفير يضمن خصوصية السجلات.",
+        "dashboards": "لوحات تحكم في الوقت الفعلي",
+        "dashboards-desc": "رصد مباشر للمؤشرات: الحالات، الاتصالات التي تم فحصها، معدلات الالتزام، وغيرها.",
+        "pwa": "تطبيق ويب للهواتف",
+        "pwa-desc": "لا حاجة لتنزيل تطبيق. الوصول عبر متصفح الهاتف — بيانات منخفضة، تحميل سريع.",
+        "arch-title": "بنية النظام",
+        "arch-tracer": "العامل الميداني (دون اتصال)",
+        "arch-firebase": "فايربيس (المزامنة عند الاتصال)",
+        "arch-dashboard": "لوحة تحكم المدير",
+        "arch-desc": "مبنية باستخدام React.js (PWA) + Firebase — مُحسّنة لواقع الصومال الذي يعتمد على الهاتف المحمول.",
+        "demo-title": "معاينة شاشات التطبيق",
+        "login-title": "تسجيل الدخول",
+        "app-name": "تتبع حالات السل",
+        "signin": "تسجيل الدخول",
+        "username": "اسم المستخدم",
+        "password": "كلمة المرور",
+        "login-btn": "دخول",
+        "register-case": "تسجيل حالة جديدة",
+        "new-case": "حالة سل جديدة",
+        "name-label": "الاسم",
+        "address-label": "العنوان",
+        "diag-date": "تاريخ التشخيص",
+        "save-btn": "حفظ وإضافة الاتصالات",
+        "contact-tracing": "تتبع الاتصالات",
+        "contact-list": "قائمة الاتصالات",
+        "screened": "ابنة | تم الفحص ✅",
+        "pending": "أخ | معلق ⏳",
+        "new-contact": "اتصال جديد",
+        "add-contact": "+ إضافة اتصال",
+        "sync-btn": "مزامنة الآن (دون اتصال)",
+        "workflow-title": "كيف يعمل",
+        "step1-title": "تشخيص السل",
+        "step1-desc": "يقوم الطبيب بتسجيل الحالة عبر التطبيق أو الورق (يتم رقمنته لاحقًا).",
+        "step2-title": "تعيين المتعقب",
+        "step2-desc": "يُعيّن النظام تلقائيًا عامل صحي مجتمعي للحالة.",
+        "step3-title": "الزيارة الميدانية (دون اتصال)",
+        "step3-desc": "يستخدم المتعقب التطبيق المحمول لتسجيل الاتصالات، الأعراض، والموقع الجغرافي.",
+        "step4-title": "المزامنة والتنبيهات",
+        "step4-desc": "عند الاتصال، تُحمّل البيانات. تفويت الجرعات يُطلق تنبيهات عبر الرسائل أو التطبيق.",
+        "step5-title": "رؤى لوحة التحكم",
+        "step5-desc": "يطلع المديرون على الخرائط الفورية، إحصائيات الالتزام، وتنبيهات التجمعات.",
+        "somalia-title": "مصمم للصومال",
+        "banaadir": "📍 تركيز على بنادر",
+        "banaadir-desc": "تم اختباره في مقديشو — أعلى منطقة إصابة بالسل في الصومال مع انتشار هواتف ذكية بنسبة >70%.",
+        "privacy": "🛡️ الخصوصية أولًا",
+        "privacy-desc": "بيانات مشفرة، GPS بموافقة، وصول مخصص — لضمان سرية المرضى.",
+        "scalable": "🚀 منصة قابلة للتوسع",
+        "scalable-desc": "تم بناؤها للتوسع إلى مناطق أخرى بعد تقييم النموذج الأولي — بدون تكلفة بنية تحتية.",
+        "footer-title": "نظام تتبع حالات السل وإدارتها",
+        "footer-thesis": "مشروع تخرّج — جامعة الصومال العاصمة"
+      }
+    };
+
+    function setLanguage(lang) {
+      document.documentElement.lang = lang;
+      document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+
+      // Update translatable text
+      document.querySelectorAll('[data-key]').forEach(el => {
+        const key = el.getAttribute('data-key');
+        if (translations[lang] && translations[lang][key]) {
+          el.textContent = translations[lang][key];
+        }
+      });
+
+      // Update placeholder attributes (for inputs)
+      document.querySelectorAll('[data-placeholder]').forEach(el => {
+        const key = el.getAttribute('data-placeholder');
+        if (translations[lang] && translations[lang][key]) {
+          el.setAttribute('placeholder', translations[lang][key]);
+        }
+      });
+
+      // Update buttons
+      document.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.getAttribute('data-lang') === lang) {
+          btn.classList.add('active');
+        }
+      });
+    }
+
+    document.querySelectorAll('.lang-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const lang = btn.getAttribute('data-lang');
+        setLanguage(lang);
+      });
+    });
+
+    // Set default to Somali (SO) for Somalia context
+    setLanguage('en');
+  </script>
+</body>
+</html>
+
