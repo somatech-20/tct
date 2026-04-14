@@ -1,0 +1,33 @@
+<div class="bg-white shadow rounded-lg p-6 max-w-2xl mx-auto">
+    <h2 class="text-xl font-bold mb-6"><%= log ? 'Edit Treatment Log' : 'Add Treatment Log' %> for <%= patient.fullName %></h2>
+    <form method="POST" action="/patients/<%= patient._id %>/treatments<%= log ? '/'+log._id+'?_method=PUT' : '' %>">
+        <div class="mb-4">
+            <label class="block text-gray-700 text-sm font-bold mb-2">Date</label>
+            <input type="date" name="date" value="<%= log ? log.date.toISOString().split('T')[0] : '' %>" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+        </div>
+        <div class="mb-4">
+            <label class="block text-gray-700 text-sm font-bold mb-2">Dose Taken</label>
+            <select name="doseTaken" class="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                <option value="true" <%= log && log.doseTaken ? 'selected' : '' %>>Yes</option>
+                <option value="false" <%= log && !log.doseTaken ? 'selected' : '' %>>No</option>
+            </select>
+        </div>
+        <div class="mb-4">
+            <label class="block text-gray-700 text-sm font-bold mb-2">Sputum Result</label>
+            <select name="sputumResult" class="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                <option value="Pending" <%= log && log.sputumResult === 'Pending' ? 'selected' : '' %>>Pending</option>
+                <option value="Negative" <%= log && log.sputumResult === 'Negative' ? 'selected' : '' %>>Negative</option>
+                <option value="Positive" <%= log && log.sputumResult === 'Positive' ? 'selected' : '' %>>Positive</option>
+                <option value="Not Done" <%= log && log.sputumResult === 'Not Done' ? 'selected' : '' %>>Not Done</option>
+            </select>
+        </div>
+        <div class="mb-6">
+            <label class="block text-gray-700 text-sm font-bold mb-2">Notes</label>
+            <textarea name="notes" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"><%= log ? log.notes : '' %></textarea>
+        </div>
+        <div class="flex items-center justify-between">
+            <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Save</button>
+            <a href="/patients/<%= patient._id %>" class="inline-block align-baseline font-bold text-sm text-indigo-600 hover:text-indigo-800">Cancel</a>
+        </div>
+    </form>
+</div>

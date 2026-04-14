@@ -1,0 +1,62 @@
+<div class="bg-white shadow rounded-lg p-6 mb-6">
+    <h2 class="text-xl font-bold mb-4"><%= patient.fullName %></h2>
+    <div class="grid grid-cols-2 gap-4">
+        <div><span class="font-semibold">Age:</span> <%= patient.age %></div>
+        <div><span class="font-semibold">Gender:</span> <%= patient.gender %></div>
+        <div><span class="font-semibold">Address:</span> <%= patient.address %></div>
+        <div><span class="font-semibold">TB Type:</span> <%= patient.tbType %></div>
+        <div><span class="font-semibold">Treatment Start:</span> <%= patient.treatmentStartDate.toDateString() %></div>
+        <div><span class="font-semibold">Status:</span> <span class="badge"><%= patient.status %></span></div>
+    </div>
+</div>
+
+<div class="bg-white shadow rounded-lg p-6 mb-6">
+    <div class="flex justify-between items-center mb-4">
+        <h3 class="text-lg font-semibold">Treatment Logs (DOTS)</h3>
+        <% if (user.role === 'doctor') { %>
+        <a href="/patients/<%= patient._id %>/treatments/new" class="bg-indigo-600 text-white px-3 py-1 rounded text-sm">Add Log</a>
+        <% } %>
+    </div>
+    <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead>
+                <tr><th>Date</th><th>Dose Taken</th><th>Sputum Result</th><th>Notes</th></tr>
+            </thead>
+            <tbody>
+                <% treatments.forEach(log => { %>
+                <tr>
+                    <td><%= log.date.toDateString() %></td>
+                    <td><%= log.doseTaken ? 'Yes' : 'No' %></td>
+                    <td><%= log.sputumResult %></td>
+                    <td><%= log.notes || '' %></td>
+                </tr>
+                <% }); %>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="bg-white shadow rounded-lg p-6">
+    <div class="flex justify-between items-center mb-4">
+        <h3 class="text-lg font-semibold">Contacts</h3>
+        <a href="/patients/<%= patient._id %>/contacts/new" class="bg-indigo-600 text-white px-3 py-1 rounded text-sm">Add Contact</a>
+    </div>
+    <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead>
+                <tr><th>Name</th><th>Relationship</th><th>Screening Date</th><th>Symptoms</th><th>Status</th></tr>
+            </thead>
+            <tbody>
+                <% contacts.forEach(contact => { %>
+                <tr>
+                    <td><%= contact.fullName %></td>
+                    <td><%= contact.relationship %></td>
+                    <td><%= contact.screeningDate.toDateString() %></td>
+                    <td><%= contact.symptoms || '' %></td>
+                    <td><%= contact.screeningStatus %></td>
+                </tr>
+                <% }); %>
+            </tbody>
+        </table>
+    </div>
+</div>

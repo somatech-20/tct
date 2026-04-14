@@ -1,0 +1,33 @@
+<div class="bg-white shadow rounded-lg p-6 max-w-2xl mx-auto">
+    <h2 class="text-xl font-bold mb-6"><%= contact ? 'Edit Contact' : 'Add Contact' %> for <%= patient.fullName %></h2>
+    <form method="POST" action="/patients/<%= patient._id %>/contacts<%= contact ? '/'+contact._id+'?_method=PUT' : '' %>">
+        <div class="mb-4">
+            <label class="block text-gray-700 text-sm font-bold mb-2">Full Name</label>
+            <input type="text" name="fullName" value="<%= contact ? contact.fullName : '' %>" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+        </div>
+        <div class="mb-4">
+            <label class="block text-gray-700 text-sm font-bold mb-2">Relationship</label>
+            <input type="text" name="relationship" value="<%= contact ? contact.relationship : '' %>" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+        </div>
+        <div class="mb-4">
+            <label class="block text-gray-700 text-sm font-bold mb-2">Screening Date</label>
+            <input type="date" name="screeningDate" value="<%= contact ? contact.screeningDate.toISOString().split('T')[0] : '' %>" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+        </div>
+        <div class="mb-4">
+            <label class="block text-gray-700 text-sm font-bold mb-2">Symptoms</label>
+            <textarea name="symptoms" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"><%= contact ? contact.symptoms : '' %></textarea>
+        </div>
+        <div class="mb-6">
+            <label class="block text-gray-700 text-sm font-bold mb-2">Screening Status</label>
+            <select name="screeningStatus" class="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                <option value="Pending" <%= contact && contact.screeningStatus === 'Pending' ? 'selected' : '' %>>Pending</option>
+                <option value="Cleared" <%= contact && contact.screeningStatus === 'Cleared' ? 'selected' : '' %>>Cleared</option>
+                <option value="Symptomatic" <%= contact && contact.screeningStatus === 'Symptomatic' ? 'selected' : '' %>>Symptomatic</option>
+            </select>
+        </div>
+        <div class="flex items-center justify-between">
+            <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Save</button>
+            <a href="/patients/<%= patient._id %>" class="inline-block align-baseline font-bold text-sm text-indigo-600 hover:text-indigo-800">Cancel</a>
+        </div>
+    </form>
+</div>

@@ -1,0 +1,142 @@
+<div class="max-w-2xl mx-auto">
+    <div class="bg-white rounded-lg shadow p-6 mb-6">
+        <h2 class="text-xl font-bold mb-4">Profile Information</h2>
+        <div class="mb-4">
+            <label class="block text-gray-700 text-sm font-bold mb-2">Username</label>
+            <input type="text" value="<%= user.username %>" disabled
+                class="bg-gray-100 w-full px-3 py-2 border rounded">
+        </div>
+        <div class="mb-4">
+            <label class="block text-gray-700 text-sm font-bold mb-2">Role</label>
+            <input type="text" value="<%= user.role %>" disabled class="bg-gray-100 w-full px-3 py-2 border rounded">
+        </div>
+    </div>
+
+    <div class="bg-white rounded-lg shadow p-6 mb-6">
+        <h2 class="text-xl font-bold mb-4">Change Password</h2>
+        <% if (error) { %>
+            <div class="bg-red-100 text-red-700 p-2 rounded mb-4">
+                <%= error %>
+            </div>
+            <% } %>
+                <% if (success) { %>
+                    <div class="bg-green-100 text-green-700 p-2 rounded mb-4">
+                        <%= success %>
+                    </div>
+                    <% } %>
+                        <form method="POST" action="/profile/password">
+                            <div class="mb-4">
+                                <label class="block text-gray-700 text-sm font-bold mb-2">Current Password</label>
+                                <input type="password" name="currentPassword"
+                                    class="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                    required>
+                            </div>
+                            <div class="mb-4">
+                                <label class="block text-gray-700 text-sm font-bold mb-2">New Password</label>
+                                <input type="password" name="newPassword"
+                                    class="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                    required>
+                            </div>
+                            <div class="mb-6">
+                                <label class="block text-gray-700 text-sm font-bold mb-2">Confirm New Password</label>
+                                <input type="password" name="confirmPassword"
+                                    class="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                    required>
+                            </div>
+                            <button type="submit"
+                                class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded">Update
+                                Password</button>
+                        </form>
+    </div>
+
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-6">
+    <h2 class="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-100">Appearance</h2>
+    <div class="grid grid-cols-3 gap-4" id="themeOptions">
+
+        <!-- Light -->
+        <div data-theme="light"
+            class="appearance-item cursor-pointer group border rounded-xl p-3 transition hover:border-indigo-500 dark:border-gray-700">
+            <div class="rounded-lg border bg-gray-100 p-4 flex items-center justify-center relative">
+                <span class="text-black font-semibold">Aa</span>
+                <div class="checkmark absolute top-2 right-2 hidden">
+                    <div class="bg-white rounded-full p-1 shadow">
+                        <svg class="w-4 h-4 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+                        </svg>
+                    </div>
+                </div>
+            </div>
+            <p class="text-center mt-2 text-sm text-gray-700 dark:text-gray-300">Light</p>
+        </div>
+
+        <!-- Dark -->
+        <div data-theme="dark"
+            class="appearance-item cursor-pointer group border rounded-xl p-3 transition hover:border-indigo-500 dark:border-gray-700">
+            <div class="rounded-lg border bg-black p-4 flex items-center justify-center relative">
+                <span class="text-white font-semibold">Aa</span>
+                <div class="checkmark absolute top-2 right-2 hidden">
+                    <div class="bg-white rounded-full p-1 shadow">
+                        <svg class="w-4 h-4 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+                        </svg>
+                    </div>
+                </div>
+            </div>
+            <p class="text-center mt-2 text-sm text-gray-700 dark:text-gray-300">Dark</p>
+        </div>
+
+        <!-- System -->
+        <div data-theme="system"
+            class="appearance-item cursor-pointer group border rounded-xl p-3 transition hover:border-indigo-500 dark:border-gray-700">
+            <div class="rounded-lg border bg-gradient-to-r from-gray-100 to-black p-4 flex items-center justify-center relative">
+                <span class="text-white font-semibold mix-blend-difference">Aa</span>
+                <div class="checkmark absolute top-2 right-2 hidden">
+                    <div class="bg-white rounded-full p-1 shadow">
+                        <svg class="w-4 h-4 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+                        </svg>
+                    </div>
+                </div>
+            </div>
+            <p class="text-center mt-2 text-sm text-gray-700 dark:text-gray-300">System</p>
+        </div>
+
+    </div>
+</div>
+
+<script nonce="<%= nonce %>">
+    // Highlight the currently selected theme
+    function highlightSelectedTheme() {
+        const saved = localStorage.getItem('theme') || 'system';
+        const items = document.querySelectorAll('.appearance-item');
+        items.forEach(item => {
+            const theme = item.dataset.theme;
+            const checkmark = item.querySelector('.checkmark');
+            if (theme === saved) {
+                checkmark.classList.remove('hidden');
+            } else {
+                checkmark.classList.add('hidden');
+            }
+        });
+    }
+
+    // Attach click listeners after DOM is ready
+    document.addEventListener('DOMContentLoaded', () => {
+        highlightSelectedTheme();
+
+        const themeOptions = document.querySelectorAll('.appearance-item');
+        themeOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                const theme = option.dataset.theme;
+                if (window.updateTheme) {
+                    window.updateTheme(theme);
+                } else {
+                    // fallback if updateTheme not defined (shouldn't happen)
+                    localStorage.setItem('theme', theme);
+                    if (window.setTheme) window.setTheme(theme);
+                }
+                highlightSelectedTheme();
+            });
+        });
+    });
+</script>
