@@ -10,11 +10,11 @@ exports.postLogin = async (req, res) => {
     const { username, password } = req.body;
     const user = await User.findOne({ username });
     if (!user) {
-      return res.render('auth/login', { error: 'Invalid credentials' });
+      return res.render('auth/login', { error: 'Invalid credentials', layout: false });
     }
     const match = await bcrypt.compare(password, user.password);
     if (!match) {
-      return res.render('auth/login', { error: 'Invalid credentials' });
+      return res.render('auth/login', { error: 'Invalid credentials', layout: false });
     }
     req.session.userId = user._id;
     req.session.userRole = user.role;
