@@ -2,18 +2,18 @@
     <h2 class="text-xl font-bold mb-6"><%= log ? 'Edit Treatment Log' : 'Add Treatment Log' %> for <%= patient.fullName %></h2>
     <form method="POST" action="/patients/<%= patient._id %>/treatments<%= log ? '/'+log._id+'?_method=PUT' : '' %>">
         <div class="mb-4">
-            <label class="block text-gray-700 text-sm font-bold mb-2">Date</label>
+            <label class="block text-gray-700 text-sm font-bold mb-2"><%= t('date') %></label>
             <input type="date" name="date" value="<%= log ? log.date.toISOString().split('T')[0] : '' %>" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
         </div>
         <div class="mb-4">
-            <label class="block text-gray-700 text-sm font-bold mb-2">Dose Taken</label>
+            <label class="block text-gray-700 text-sm font-bold mb-2"><%= t('dose_taken') %></label>
             <select name="doseTaken" class="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
                 <option value="true" <%= log && log.doseTaken ? 'selected' : '' %>>Yes</option>
                 <option value="false" <%= log && !log.doseTaken ? 'selected' : '' %>>No</option>
             </select>
         </div>
         <div class="mb-4">
-            <label class="block text-gray-700 text-sm font-bold mb-2">Sputum Result</label>
+            <label class="block text-gray-700 text-sm font-bold mb-2"><%= t('sputum_result') %></label>
             <select name="sputumResult" class="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
                 <option value="Pending" <%= log && log.sputumResult === 'Pending' ? 'selected' : '' %>>Pending</option>
                 <option value="Negative" <%= log && log.sputumResult === 'Negative' ? 'selected' : '' %>>Negative</option>
@@ -22,7 +22,7 @@
             </select>
         </div>
         <div class="mb-6">
-            <label class="block text-gray-700 text-sm font-bold mb-2">Notes</label>
+            <label class="block text-gray-700 text-sm font-bold mb-2"><%= t('notes') %></label>
             <textarea name="notes" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"><%= log ? log.notes : '' %></textarea>
         </div>
         <div class="flex items-center justify-between">

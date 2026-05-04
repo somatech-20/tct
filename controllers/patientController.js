@@ -1,6 +1,36 @@
 const Patient = require('../models/Patient');
 const TreatmentLog = require('../models/TreatmentLog');
 const Contact = require('../models/Contact');
+const json2csv = require('json2csv').parse;
+const ExcelJS = require('exceljs');
+
+exports.exportCSV = async (req, res) => {
+  const patients = await Patient.find().lean();
+  const fields = ['fullName', 'age', 'gender', 'tbType', 'status', 'treatmentStartDate'];
+  const csv = json2csv(patients, { fields });
+  res.header('Content-Type', 'text/csv');
+  res.attachment('patients.csv');
+  res.send(csv);
+};
+
+exports.exportExcel = async (req, res) => {
+  const patients = await Patient.find().lean();
+  const workbook = new ExcelJS.Workbook();
+  const worksheet = workbook.addWorksheet('Patients');
+  worksheet.columns = [
+    { header: 'Name', key: 'fullName', width: 30 },
+    { header: 'Age', key: 'age', width: 10 },
+    { header: 'Gender', key: 'gender', width: 10 },
+    { header: 'TB Type', key: 'tbType', width: 20 },
+    { header: 'Status', key: 'status', width: 15 },
+    { header: 'Start Date', key: 'treatmentStartDate', width: 15 }
+  ];
+  worksheet.addRows(patients);
+  res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+  res.setHeader('Content-Disposition', 'attachment; filename=patients.xlsx');
+  await workbook.xlsx.write(res);
+  res.end();
+};
 
 exports.list = async (req, res) => {
   try {

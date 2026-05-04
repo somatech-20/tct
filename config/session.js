@@ -11,7 +11,7 @@ module.exports = (app) => {
       collectionName: 'sessions'
     }),
     cookie: {
-      secure: process.env.NODE_ENV === 'production',
+      secure: process.env.NODE_ENV === 'production' ? true : false,
       httpOnly: true,
       maxAge: 1000 * 60 * 60 * 24 // 1 day
     }

@@ -1,20 +1,20 @@
 <div class="bg-white shadow rounded-lg p-6 mb-6">
     <h2 class="text-xl font-bold mb-4"><%= patient.fullName %></h2>
     <div class="grid grid-cols-2 gap-4">
-        <div><span class="font-semibold">Age:</span> <%= patient.age %></div>
-        <div><span class="font-semibold">Gender:</span> <%= patient.gender %></div>
-        <div><span class="font-semibold">Address:</span> <%= patient.address %></div>
-        <div><span class="font-semibold">TB Type:</span> <%= patient.tbType %></div>
-        <div><span class="font-semibold">Treatment Start:</span> <%= patient.treatmentStartDate.toDateString() %></div>
-        <div><span class="font-semibold">Status:</span> <span class="badge"><%= patient.status %></span></div>
+        <div><span class="font-semibold"><%= t('age') %>:</span> <%= patient.age %></div>
+        <div><span class="font-semibold"><%= t('gender') %>:</span> <%= patient.gender %></div>
+        <div><span class="font-semibold"><%= t('address') %>:</span> <%= patient.address %></div>
+        <div><span class="font-semibold"><%= t('tb_type') %>:</span> <%= patient.tbType %></div>
+        <div><span class="font-semibold"><%= t('treatment_start') %>:</span> <%= patient.treatmentStartDate.toDateString() %></div>
+        <div><span class="font-semibold"><%= t('status') %>:</span> <span class="badge"><%= patient.status %></span></div>
     </div>
 </div>
 
 <div class="bg-white shadow rounded-lg p-6 mb-6">
     <div class="flex justify-between items-center mb-4">
-        <h3 class="text-lg font-semibold">Treatment Logs (DOTS)</h3>
+        <h3 class="text-lg font-semibold"><%= t('treatment_logs') %></h3>
         <% if (user.role === 'doctor') { %>
-        <a href="/patients/<%= patient._id %>/treatments/new" class="bg-indigo-600 text-white px-3 py-1 rounded text-sm">Add Log</a>
+        <a href="/patients/<%= patient._id %>/treatments/new" class="bg-indigo-600 text-white px-3 py-1 rounded text-sm"><%= t('add_log') %></a>
         <% } %>
     </div>
     <div class="overflow-x-auto">

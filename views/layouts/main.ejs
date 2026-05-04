@@ -49,7 +49,7 @@
             display: block;
         }
 
-        @media (min-width: 768px) {
+        @media (min-width: 766px) {
             .sidebar {
                 transform: translateX(0) !important;
                 /* always visible on desktop */
@@ -282,8 +282,21 @@
         .dark .bg-white .overflow-x-auto table tbody tr:hover {
             background-color: #334155;
         }
+
+        /* Modal styles for dark mode */
+        .dark #settingsModal .bg-white {
+            background-color: #1e293b;
+        }
+
+        .dark #settingsModal .text-gray-400 {
+            color: #94a3b8;
+        }
+
+        .dark #settingsModal .border {
+            border-color: #475569;
+        }
     </style>
-    <script nonce="<%= nonce %>">
+    <!-- <script nonce="<%= nonce %>">
         // Theme management
         function setTheme(theme) {
             if (theme === 'dark') {
@@ -356,7 +369,7 @@
                 });
             });
         });
-    </script>
+    </script> -->
 </head>
 
 <body class="bg-gray-100">
@@ -420,7 +433,189 @@
             <span class="text-gray-700">Processing...</span>
         </div>
     </div>
+
+    <!-- Settings Modal -->
+    <div id="settingsModal"
+        class="fixed inset-0 bg-gray-900 bg-opacity-50 dark:bg-opacity-70 overflow-y-auto h-full w-full z-50 hidden">
+        <div
+            class="relative top-20 mx-auto p-5 border w-96 shadow-xl rounded-lg bg-white dark:bg-gray-800 transition-all duration-200">
+            <div class="flex justify-between items-center border-b pb-3 mb-4 dark:border-gray-700">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                    <%= t('settings') %>
+                </h3>
+                <button id="closeModal" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <!-- Appearance -->
+            <div class="mb-6">
+                <h4 class="font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    <%= t('appearance') %>
+                </h4>
+                <div class="flex space-x-3">
+                    <button data-theme="light"
+                        class="theme-btn px-3 py-1 rounded border bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition">
+                        <%= t('light') %>
+                    </button>
+                    <button data-theme="dark"
+                        class="theme-btn px-3 py-1 rounded border bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition">
+                        <%= t('dark') %>
+                    </button>
+                    <button data-theme="system"
+                        class="theme-btn px-3 py-1 rounded border bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition">
+                        <%= t('system') %>
+                    </button>
+                </div>
+            </div>
+            <!-- Language -->
+            <div>
+                <h4 class="font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    <%= t('language') %>
+                </h4>
+                <select id="modalLangSwitcher"
+                    class="w-full p-2 border rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                    <option value="en" <%=locale==='en' ? 'selected' : '' %>><%= t('english') %>
+                    </option>
+                    <option value="ar" <%=locale==='ar' ? 'selected' : '' %>>العربية</option>
+                    <option value="so" <%=locale==='so' ? 'selected' : '' %>>Soomaali</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
     <script nonce="<%= nonce %>">
+        // ========== THEME MANAGEMENT ==========
+        function setTheme(theme) {
+            if (theme === 'dark') {
+                document.documentElement.classList.add('dark');
+            } else if (theme === 'light') {
+                document.documentElement.classList.remove('dark');
+            } else {
+                if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                    document.documentElement.classList.add('dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                }
+            }
+        }
+        const savedTheme = localStorage.getItem('theme') || 'system';
+        setTheme(savedTheme);
+        if (savedTheme === 'system') {
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+                if (localStorage.getItem('theme') === 'system') setTheme('system');
+            });
+        }
+        window.updateTheme = (value) => {
+            localStorage.setItem('theme', value);
+            setTheme(value);
+        };
+
+        function highlightActiveTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'system';
+            const themeBtns = document.querySelectorAll('.theme-btn');
+            themeBtns.forEach(btn => {
+                if (btn.dataset.theme === savedTheme) {
+                    btn.classList.add('bg-indigo-600', 'text-white');
+                    btn.classList.remove('bg-gray-200', 'dark:bg-gray-700');
+                } else {
+                    btn.classList.remove('bg-indigo-600', 'text-white');
+                    btn.classList.add('bg-gray-200', 'dark:bg-gray-700');
+                }
+            });
+        }
+
+        // ========== SIDEBAR TOGGLE (MOBILE) ==========
+        document.addEventListener('DOMContentLoaded', () => {
+            highlightActiveTheme();
+            const toggleBtn = document.getElementById('menuToggle');
+            const sidebar = document.getElementById('sidebar');
+            const backdrop = document.getElementById('sidebarBackdrop');
+            const closeBtn = document.getElementById('sidebarClose');
+            if (toggleBtn && sidebar && backdrop) {
+                const openSidebar = () => { sidebar.classList.add('open'); backdrop.classList.add('active'); };
+                const closeSidebar = () => { sidebar.classList.remove('open'); backdrop.classList.remove('active'); };
+                toggleBtn.addEventListener('click', () => {
+                    if (sidebar.classList.contains('open')) closeSidebar();
+                    else openSidebar();
+                });
+                if (backdrop) backdrop.addEventListener('click', closeSidebar);
+                if (closeBtn) closeBtn.addEventListener('click', closeSidebar);
+                document.querySelectorAll('#sidebar a').forEach(link => {
+                    link.addEventListener('click', () => { if (window.innerWidth < 768) closeSidebar(); });
+                });
+            }
+        });
+
+        // ========== MODAL & SETTINGS ==========
+        document.addEventListener('DOMContentLoaded', () => {
+            const settingsBtn = document.getElementById('settingsButton');
+            const modal = document.getElementById('settingsModal');
+            const closeModalBtn = document.getElementById('closeModal');
+            if (settingsBtn && modal) {
+                settingsBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    modal.classList.remove('hidden');
+                });
+                closeModalBtn.addEventListener('click', () => modal.classList.add('hidden'));
+                window.addEventListener('click', (e) => { if (e.target === modal) modal.classList.add('hidden'); });
+            }
+
+            function changeLanguage(lang) {
+                const url = new URL(window.location.href);
+                url.searchParams.set('lang', lang);
+                window.location.href = url.toString();
+            }
+
+            // Language switcher inside modal
+            const modalLang = document.getElementById('modalLangSwitcher');
+            if (modalLang) {
+                modalLang.addEventListener('change', (e) => {
+                    changeLanguage(e.target.value);
+                });
+            }
+
+            // Language switcher in header
+            const headerLang = document.getElementById('headerLangSwitcher');
+            if (headerLang) {
+                headerLang.addEventListener('change', (e) => {
+                    changeLanguage(e.target.value);
+                });
+            }
+
+            // Theme buttons (no inline onclick)
+            const themeBtns = document.querySelectorAll('.theme-btn');
+            themeBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const theme = btn.dataset.theme;
+                    updateTheme(theme);
+                    // Update active class without reload
+                    themeBtns.forEach(b => {
+                        if (b.dataset.theme === theme) {
+                            b.classList.add('bg-indigo-600', 'text-white');
+                            b.classList.remove('bg-gray-200', 'dark:bg-gray-700');
+                        } else {
+                            b.classList.remove('bg-indigo-600', 'text-white');
+                            b.classList.add('bg-gray-200', 'dark:bg-gray-700');
+                        }
+                    });
+                });
+            });
+        });
+
+        // ========== LOADING SPINNER ==========
+        document.querySelectorAll('form').forEach(form => {
+            form.addEventListener('submit', () => {
+                document.getElementById('loadingOverlay').classList.remove('hidden');
+            });
+        });
+        window.addEventListener('load', () => {
+            document.getElementById('loadingOverlay').classList.add('hidden');
+        });
+    </script>
+    <!-- <script nonce="<%= nonce %>">
         // Show loading spinner on any form submit
         document.querySelectorAll('form').forEach(form => {
             form.addEventListener('submit', function (e) {
@@ -431,7 +626,7 @@
         window.addEventListener('load', () => {
             document.getElementById('loadingOverlay').classList.add('hidden');
         });
-    </script>
+    </script> -->
 </body>
 
 </html>

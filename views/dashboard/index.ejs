@@ -5,7 +5,7 @@
             <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
         </div>
         <div>
-            <h3 class="text-gray-500 text-sm">Active Cases</h3>
+            <h3 class="text-gray-500 text-sm"><%= t('active_cases') %></h3>
             <p class="text-3xl font-bold"><%= totalActive %></p>
         </div>
     </div>
@@ -15,7 +15,7 @@
             <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
         </div>
         <div>
-            <h3 class="text-gray-500 text-sm">Recovered</h3>
+            <h3 class="text-gray-500 text-sm"><%= t('recovered') %></h3>
             <p class="text-3xl font-bold"><%= recovered %></p>
         </div>
     </div>
@@ -25,7 +25,7 @@
             <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
         </div>
         <div>
-            <h3 class="text-gray-500 text-sm">Defaulters</h3>
+            <h3 class="text-gray-500 text-sm"><%= t('defaulters') %></h3>
             <p class="text-3xl font-bold"><%= defaulters %></p>
         </div>
     </div>
@@ -35,7 +35,7 @@
 <div class="bg-white rounded-lg shadow p-6">
     <div class="flex items-center space-x-3 mb-4">
         <svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
-        <h3 class="text-lg font-semibold">Missed Doses (Last 7 Days)</h3>
+        <h3 class="text-lg font-semibold"><%= t('missed_doses') %></h3>
     </div>
     <p class="text-2xl font-bold text-red-600"><%= missedDoses %></p>
 </div>

@@ -1,6 +1,8 @@
 const mongoose = require('mongoose');
 
 const patientSchema = new mongoose.Schema({
+  email: { type: String, required: false },
+  phone: { type: String, required: false },
   fullName: { type: String, required: true },
   age: { type: Number, required: true },
   gender: { type: String, enum: ['Male', 'Female', 'Other'], required: true },

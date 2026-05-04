@@ -1,47 +1,79 @@
+<!-- Export -->
+<div class="flex justify-between items-center mb-4">
+    <h2>
+        <%= t('patients') %>
+    </h2>
+    <div>
+        <a href="/patients/export/csv" class="bg-green-600 text-white px-3 py-1 rounded">Export CSV</a>
+        <a href="/patients/export/excel" class="bg-blue-600 text-white px-3 py-1 rounded">Export Excel</a>
+    </div>
+</div>
 <div class="bg-white rounded-lg shadow overflow-hidden">
     <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
         <h2 class="text-xl font-semibold">Patients</h2>
-        <% if (user.role === 'doctor') { %>
-        <a href="/patients/new" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded text-sm flex items-center">
-            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
-            Add Patient
-        </a>
-        <% } %>
+        <% if (user.role==='doctor' ) { %>
+            <a href="/patients/new"
+                class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded text-sm flex items-center">
+                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                </svg>
+                Add Patient
+            </a>
+            <% } %>
     </div>
     <div class="overflow-x-auto">
         <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
                 <tr>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Age/Gender</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">TB Type</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Age/Gender</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">TB Type
+                    </th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status
+                    </th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions
+                    </th>
                 </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
-                <% patients.forEach(patient => { %>
-                <tr>
-                    
-                    <td class="px-6 py-4 whitespace-nowrap"><a href="/patients/<%= patient._id %>" class="text-indigo-600 hover:text-indigo-900"><%= patient.fullName %></a></td>
-                    <td class="px-6 py-4 whitespace-nowrap"><a href="/patients/<%= patient._id %>" class="text-indigo-600 hover:text-indigo-900"><%= patient.age %> / <%= patient.gender %></a></td>
-                    <td class="px-6 py-4 whitespace-nowrap"><a href="/patients/<%= patient._id %>" class="text-indigo-600 hover:text-indigo-900"><%= patient.tbType %></a></td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                <% patients.forEach(patient=> { %>
+                    <tr>
+
+                        <td class="px-6 py-4 whitespace-nowrap"><a href="/patients/<%= patient._id %>"
+                                class="text-indigo-600 hover:text-indigo-900">
+                                <%= patient.fullName %>
+                            </a></td>
+                        <td class="px-6 py-4 whitespace-nowrap"><a href="/patients/<%= patient._id %>"
+                                class="text-indigo-600 hover:text-indigo-900">
+                                <%= patient.age %> / <%= patient.gender %>
+                            </a></td>
+                        <td class="px-6 py-4 whitespace-nowrap"><a href="/patients/<%= patient._id %>"
+                                class="text-indigo-600 hover:text-indigo-900">
+                                <%= patient.tbType %>
+                            </a></td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
                         <% if (patient.status === 'Active') { %>bg-green-100 text-green-800<% } 
                         else if (patient.status === 'Recovered') { %>bg-blue-100 text-blue-800<% } 
                         else { %>bg-red-100 text-red-800<% } %>">
-                            <a href="/patients/<%= patient._id %>" class="text-indigo-600 hover:text-indigo-900"><%= patient.status %></a>
-                        </span>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <a href="/patients/<%= patient._id %>" class="text-indigo-600 hover:text-indigo-900">View</a>
-                        <% if (user.role === 'doctor') { %>
-                        | <a href="/patients/<%= patient._id %>/edit" class="text-yellow-600 hover:text-yellow-900">Edit</a>
-                        <% } %>
-                    </td>
-                </tr>
-                <% }); %>
+                                <a href="/patients/<%= patient._id %>" class="text-indigo-600 hover:text-indigo-900">
+                                    <%= patient.status %>
+                                </a>
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <a href="/patients/<%= patient._id %>"
+                                class="text-indigo-600 hover:text-indigo-900">View</a>
+                            <% if (user.role==='doctor' ) { %>
+                                | <a href="/patients/<%= patient._id %>/edit"
+                                    class="text-yellow-600 hover:text-yellow-900">Edit</a>
+                                <% } %>
+                        </td>
+                    </tr>
+                    <% }); %>
             </tbody>
         </table>
     </div>

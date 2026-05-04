@@ -48,13 +48,13 @@
         <div class="sm:mx-auto sm:w-full sm:max-w-sm">
             <img src="/ico.png" alt="TB Tracer Logo"
                 class="mx-auto h-12 2 w-auto" />
-            <h2 class="mt-10 text-center text-2xl/10 font-bold tracking-tight text-white">Log in</h2>
+            <h2 class="mt-10 text-center text-2xl/10 font-bold tracking-tight text-white"><%= t('log_in') %></h2>
         </div>
 
         <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
             <form action="/login" method="POST" class="space-y-6">
                 <div>
-                    <label class="block text-sm/6 font-medium text-gray-100">Username</label>
+                    <label class="block text-sm/6 font-medium text-gray-100"><%= t('username') %></label>
                     <div class="mt-2">
                         <input type="text" name="username" required autocomplete="username"
                             class="block w-full rounded-md bg-white/5 px-3 py-1.5 text-base text-white outline-1 -outline-offset-1 outline-white/10 placeholder:text-gray-500 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-500 sm:text-sm/6" />
@@ -63,7 +63,7 @@
 
                 <div>
                     <div class="flex items-center justify-between">
-                        <label class="block text-sm/6 font-medium text-gray-100">Password</label>
+                        <label class="block text-sm/6 font-medium text-gray-100"><%= t('password') %></label>
                         <!-- <div class="text-sm">
                             <a href="#" class="font-semibold text-indigo-400 hover:text-indigo-300">Forgot password?</a>
                         </div> -->

@@ -8,10 +8,11 @@ const sessionConfig = require('./config/session');
 const limiter = require('./middleware/rateLimiter');
 const expressLayouts = require('express-ejs-layouts');
 const crypto = require('crypto');
+const i18n = require('i18n');
+require('./cron/dailyReminder');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-
 
 // Connect to MongoDB
 connectDB();
@@ -52,12 +53,45 @@ app.set('views', path.join(__dirname, 'views'));
 // Session
 sessionConfig(app);
 
+i18n.configure({
+  locales: ['en', 'ar', 'so'],
+  directory: __dirname + '/locales',
+  defaultLocale: 'en',
+  cookie: 'lang',
+  queryParameter: 'lang',
+  autoReload: true,
+  updateFiles: false
+});
+// i18n init
+app.use(i18n.init);
+
+app.use((req, res, next) => {
+  // Language from query or session
+  if (req.query.lang) {
+    req.session.lang = req.query.lang;
+    res.setLocale(req.session.lang);
+    // log language change
+    console.log(`Language changed to: ${req.session.lang}`);
+  } else if (req.session.lang) {
+    res.setLocale(req.session.lang);
+  }
+  // Expose helpers to all views
+  res.locals.t = req.__;
+  res.locals.locale = req.getLocale();
+  res.locals.theme = req.session.theme || 'system';
+  res.locals.user = req.session.userId
+    ? {
+        id: req.session.userId,
+        role: req.session.userRole,
+        username: req.session.username,
+      }
+    : null;
+  res.locals.currentPath = req.path;
+  next();
+});
+
 // Static files
 app.use(express.static(path.join(__dirname, 'public')));
-
-// View engine setup
-app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, 'views'));
 
 // Make user available to all views
 app.use((req, res, next) => {
@@ -100,5 +134,6 @@ app.use((err, req, res, next) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`Server running on: http://localhost:${PORT}`);
+  console.log(process.env.MONGODB_URI);
 });
