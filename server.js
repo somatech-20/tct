@@ -138,6 +138,26 @@ app.get('/', (req, res) => {
   }
 });
 
+// test route to daily reminder cron job
+app.get('/test-email', async (req, res) => {
+  try {
+
+    // block in production
+    if (process.env.NODE_ENV === 'production') {
+      return res.status(403).send('Forbidden');
+    }
+
+    const { dailyReminder } = require('./cron/dailyReminder');
+
+    await dailyReminder();
+
+    res.send('Test reminder job executed successfully');
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Failed to execute test job');
+  }
+});
+
 // 404 handler
 app.use((req, res) => {
   res.status(404).send('Page not found');

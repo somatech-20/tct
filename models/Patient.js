@@ -11,7 +11,8 @@ const patientSchema = new mongoose.Schema({
   treatmentStartDate: { type: Date, required: true },
   status: { type: String, enum: ['Active', 'Recovered', 'Defaulted'], default: 'Active' },
   createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-  createdAt: { type: Date, default: Date.now }
+  createdAt: { type: Date, default: Date.now },
+  lastReminderSent: { type: Date, default: null }
 });
 
 module.exports = mongoose.model('Patient', patientSchema);
