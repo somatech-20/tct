@@ -57,28 +57,24 @@ i18n.configure({
   locales: ['en', 'ar', 'so'],
   directory: __dirname + '/locales',
   defaultLocale: 'en',
-  cookie: 'lang',
-  queryParameter: 'lang',
+  // cookie: 'lang',
+  // queryParameter: 'lang',
   autoReload: true,
   updateFiles: false
 });
 // i18n init
 app.use(i18n.init);
 
+// Middleware to set locale, user info, theme, and current path for all views
 app.use((req, res, next) => {
-  // Language from query or session
-  if (req.query.lang) {
-    req.session.lang = req.query.lang;
-    res.setLocale(req.session.lang);
-    // log language change
-    console.log(`Language changed to: ${req.session.lang}`);
-  } else if (req.session.lang) {
-    res.setLocale(req.session.lang);
-  }
-  // Expose helpers to all views
+  const lang = req.session.lang || 'en';
+
+  req.setLocale(lang);
   res.locals.t = req.__;
-  res.locals.locale = req.getLocale();
+  res.locals.locale = lang;
+
   res.locals.theme = req.session.theme || 'system';
+
   res.locals.user = req.session.userId
     ? {
         id: req.session.userId,
@@ -86,22 +82,42 @@ app.use((req, res, next) => {
         username: req.session.username,
       }
     : null;
+
   res.locals.currentPath = req.path;
+
   next();
 });
 
 // Static files
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Make user available to all views
-app.use((req, res, next) => {
-  res.locals.user = req.session.userId ? { 
-    id: req.session.userId, 
-    role: req.session.userRole,
-    username: req.session.username 
-  } : null;
-  res.locals.currentPath = req.path;
-  next();
+app.get('/set-lang', (req, res) => {
+  const allowedLangs = ['en', 'ar', 'so'];
+
+  const lang = allowedLangs.includes(req.query.lang)
+    ? req.query.lang
+    : 'en';
+
+  req.session.lang = lang;
+
+  let returnUrl = req.query.return || '/dashboard';
+
+  // Prevent open redirects
+  if (
+    typeof returnUrl !== 'string' ||
+    !returnUrl.startsWith('/') ||
+    returnUrl.startsWith('//')
+  ) {
+    returnUrl = '/dashboard';
+  }
+
+  req.session.save((err) => {
+    if (err) {
+      console.error('Session save error:', err);
+    }
+
+    res.redirect(returnUrl);
+  });
 });
 
 // Routes
@@ -135,5 +151,6 @@ app.use((err, req, res, next) => {
 
 app.listen(PORT, () => {
   console.log(`Server running on: http://localhost:${PORT}`);
-  console.log(process.env.MONGODB_URI);
+  // console.log(process.env.MONGODB_URI);
+  console.log(process.env.NODE_ENV);
 });

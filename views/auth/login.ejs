@@ -11,86 +11,95 @@
 <!-- class="bg-gray-100 flex items-center justify-center h-screen" -->
 
 <body class="bg-gray-800 items-center justify-center h-screen">
-    <!-- <div class="bg-white p-8 rounded shadow-md w-96">
-        <h1 class="text-2xl font-bold mb-6 text-center">TB Case Tracer</h1>
-        <% if (error) { %>
-            <div class="bg-red-100 text-red-700 p-2 rounded mb-4">
-                <%= error %>
+    <% const errorM=locals.error || null; %>
+
+        <div id="error-container">
+            <% if (errorM) { %>
+                <div class="bg-red-100 text-red-700 p-2 rounded mb-4">
+                    <%= errorM %>
+                </div>
+                <% } %>
+        </div>
+
+        <script nonce="<%= nonce %>">
+            (() => {
+                // If server already rendered an error, skip URL parsing
+                const hasServerError =
+                    document.querySelector('#error-container .bg-red-100');
+
+                if (!hasServerError) {
+                    const params = new URLSearchParams(window.location.search);
+                    const urlError = params.get('error');
+
+                    if (urlError) {
+                        document.getElementById('error-container').innerHTML = `
+                    <div class="bg-red-100 text-red-700 p-2 rounded mb-4">
+                        ${urlError}
+                    </div>
+                `;
+
+                        // Clean URL
+                        const url = new URL(window.location.href);
+                        url.searchParams.delete('error');
+                        window.history.replaceState({}, document.title, url);
+                    }
+                }
+            })();
+        </script>
+
+
+        <div class="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
+            <div class="sm:mx-auto sm:w-full sm:max-w-sm">
+                <img src="/ico.png" alt="TB Tracer Logo" class="mx-auto h-12 2 w-auto" />
+                <h2 class="mt-10 text-center text-2xl/10 font-bold tracking-tight text-white">
+                    <%= t('log_in') %>
+                </h2>
             </div>
-            <% } %>
-                <form method="POST" action="/login">
-                    <div class="mb-4">
-                        <label class="block text-gray-700 text-sm font-bold mb-2">Username</label>
-                        <input type="text" name="username"
-                            class="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                            required>
+
+            <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
+                <form action="/login" method="POST" class="space-y-6">
+                    <div>
+                        <label class="block text-sm/6 font-medium text-gray-100">
+                            <%= t('username') %>
+                        </label>
+                        <div class="mt-2">
+                            <input type="text" name="username" required autocomplete="username"
+                                class="block w-full rounded-md bg-white/5 px-3 py-1.5 text-base text-white outline-1 -outline-offset-1 outline-white/10 placeholder:text-gray-500 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-500 sm:text-sm/6" />
+                        </div>
                     </div>
-                    <div class="mb-6">
-                        <label class="block text-gray-700 text-sm font-bold mb-2">Password</label>
-                        <input type="password" name="password"
-                            class="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                            required>
+
+                    <div>
+                        <div class="flex items-center justify-between">
+                            <label class="block text-sm/6 font-medium text-gray-100">
+                                <%= t('password') %>
+                            </label>
+                            <!-- <div class="text-sm">
+                            <a href="#" class="font-semibold text-indigo-400 hover:text-indigo-300">Forgot password?</a>
+                        </div> -->
+                        </div>
+                        <div class="mt-2">
+                            <input type="password" name="password" required autocomplete="current-password"
+                                class="block w-full rounded-md bg-white/5 px-3 py-1.5 text-base text-white outline-1 -outline-offset-1 outline-white/10 placeholder:text-gray-500 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-500 sm:text-sm/6" />
+                        </div>
                     </div>
-                    <button type="submit"
-                        class="w-full bg-indigo-600 text-white py-2 rounded hover:bg-indigo-700">Login</button>
+
+                    <div>
+                        <button type="submit"
+                            class="flex w-full justify-center rounded-md bg-indigo-500 px-3 py-1.5 text-sm/6 font-semibold text-white hover:bg-indigo-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500">Sign
+                            in</button>
+                    </div>
                 </form>
                 <div class="mt-4 text-xs text-gray-500 text-center">
                     Doctors: manage patients, treatments, contacts<br>
                     Tracers: view patients and manage contacts only
                 </div>
-    </div> -->
 
-    <% if (error) { %>
-    <div class="bg-red-100 text-red-700 p-2 rounded mb-4"><%= error %></div>
-    <% } %>
-
-    <div class="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
-        <div class="sm:mx-auto sm:w-full sm:max-w-sm">
-            <img src="/ico.png" alt="TB Tracer Logo"
-                class="mx-auto h-12 2 w-auto" />
-            <h2 class="mt-10 text-center text-2xl/10 font-bold tracking-tight text-white"><%= t('log_in') %></h2>
-        </div>
-
-        <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-            <form action="/login" method="POST" class="space-y-6">
-                <div>
-                    <label class="block text-sm/6 font-medium text-gray-100"><%= t('username') %></label>
-                    <div class="mt-2">
-                        <input type="text" name="username" required autocomplete="username"
-                            class="block w-full rounded-md bg-white/5 px-3 py-1.5 text-base text-white outline-1 -outline-offset-1 outline-white/10 placeholder:text-gray-500 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-500 sm:text-sm/6" />
-                    </div>
-                </div>
-
-                <div>
-                    <div class="flex items-center justify-between">
-                        <label class="block text-sm/6 font-medium text-gray-100"><%= t('password') %></label>
-                        <!-- <div class="text-sm">
-                            <a href="#" class="font-semibold text-indigo-400 hover:text-indigo-300">Forgot password?</a>
-                        </div> -->
-                    </div>
-                    <div class="mt-2">
-                        <input type="password" name="password" required autocomplete="current-password"
-                            class="block w-full rounded-md bg-white/5 px-3 py-1.5 text-base text-white outline-1 -outline-offset-1 outline-white/10 placeholder:text-gray-500 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-500 sm:text-sm/6" />
-                    </div>
-                </div>
-
-                <div>
-                    <button type="submit"
-                        class="flex w-full justify-center rounded-md bg-indigo-500 px-3 py-1.5 text-sm/6 font-semibold text-white hover:bg-indigo-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500">Sign
-                        in</button>
-                </div>
-            </form>
-            <div class="mt-4 text-xs text-gray-500 text-center">
-                Doctors: manage patients, treatments, contacts<br>
-                Tracers: view patients and manage contacts only
-            </div>
-
-            <!-- <p class="mt-10 text-center text-sm/6 text-gray-400">
+                <!-- <p class="mt-10 text-center text-sm/6 text-gray-400">
                 Not a member?
                 <a href="#" class="font-semibold text-indigo-400 hover:text-indigo-300">Start a 14 day free trial</a>
             </p> -->
+            </div>
         </div>
-    </div>
 </body>
 
 </html>

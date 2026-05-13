@@ -296,80 +296,6 @@
             border-color: #475569;
         }
     </style>
-    <!-- <script nonce="<%= nonce %>">
-        // Theme management
-        function setTheme(theme) {
-            if (theme === 'dark') {
-                document.documentElement.classList.add('dark');
-            } else if (theme === 'light') {
-                document.documentElement.classList.remove('dark');
-            } else {
-                // system
-                if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-                    document.documentElement.classList.add('dark');
-                } else {
-                    document.documentElement.classList.remove('dark');
-                }
-            }
-        }
-
-        // Load saved theme
-        const savedTheme = localStorage.getItem('theme') || 'system';
-        setTheme(savedTheme);
-
-        // Listen for system changes
-        if (savedTheme === 'system') {
-            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
-                if (localStorage.getItem('theme') === 'system') {
-                    setTheme('system');
-                }
-            });
-        }
-
-        // Expose setTheme globally for the profile page
-        window.setTheme = setTheme;
-        window.updateTheme = (value) => {
-            localStorage.setItem('theme', value);
-            setTheme(value);
-        };
-
-        document.addEventListener('DOMContentLoaded', () => {
-            const toggleBtn = document.getElementById('menuToggle');
-            const sidebar = document.getElementById('sidebar');
-            const backdrop = document.getElementById('sidebarBackdrop');
-            const closeBtn = document.getElementById('sidebarClose');
-
-            function openSidebar() {
-                sidebar.classList.add('open');
-                backdrop.classList.add('active');
-            }
-            function closeSidebar() {
-                sidebar.classList.remove('open');
-                backdrop.classList.remove('active');
-            }
-            function toggleSidebar() {
-                if (sidebar.classList.contains('open')) {
-                    closeSidebar();
-                } else {
-                    openSidebar();
-                }
-            }
-
-            if (toggleBtn) toggleBtn.addEventListener('click', toggleSidebar);
-            if (backdrop) backdrop.addEventListener('click', closeSidebar);
-            if (closeBtn) closeBtn.addEventListener('click', closeSidebar);
-
-            // Optional: close sidebar when a nav link is clicked on mobile
-            const navLinks = document.querySelectorAll('#sidebar a');
-            navLinks.forEach(link => {
-                link.addEventListener('click', () => {
-                    if (window.innerWidth < 768) {
-                        closeSidebar();
-                    }
-                });
-            });
-        });
-    </script> -->
 </head>
 
 <body class="bg-gray-100">
@@ -563,25 +489,37 @@
                 window.addEventListener('click', (e) => { if (e.target === modal) modal.classList.add('hidden'); });
             }
 
-            function changeLanguage(lang) {
-                const url = new URL(window.location.href);
-                url.searchParams.set('lang', lang);
-                window.location.href = url.toString();
+            function handleLanguageChange(lang) {
+                const returnUrl =
+                    window.location.pathname + window.location.search;
+
+                window.location.href =
+                    `/set-lang?lang=${encodeURIComponent(lang)}&return=${encodeURIComponent(returnUrl)}`;
             }
+
+            ['modalLangSwitcher', 'headerLangSwitcher'].forEach(id => {
+                const el = document.getElementById(id);
+
+                if (el) {
+                    el.addEventListener('change', (e) => {
+                        handleLanguageChange(e.target.value);
+                    });
+                }
+            });
 
             // Language switcher inside modal
             const modalLang = document.getElementById('modalLangSwitcher');
             if (modalLang) {
                 modalLang.addEventListener('change', (e) => {
-                    changeLanguage(e.target.value);
+                    handleLanguageChange(e.target.value);
                 });
             }
 
-            // Language switcher in header
+            // Language switcher in header (same logic)
             const headerLang = document.getElementById('headerLangSwitcher');
             if (headerLang) {
                 headerLang.addEventListener('change', (e) => {
-                    changeLanguage(e.target.value);
+                    handleLanguageChange(e.target.value);
                 });
             }
 
@@ -615,18 +553,6 @@
             document.getElementById('loadingOverlay').classList.add('hidden');
         });
     </script>
-    <!-- <script nonce="<%= nonce %>">
-        // Show loading spinner on any form submit
-        document.querySelectorAll('form').forEach(form => {
-            form.addEventListener('submit', function (e) {
-                document.getElementById('loadingOverlay').classList.remove('hidden');
-            });
-        });
-        // Hide if needed after page load (in case of error)
-        window.addEventListener('load', () => {
-            document.getElementById('loadingOverlay').classList.add('hidden');
-        });
-    </script> -->
 </body>
 
 </html>
