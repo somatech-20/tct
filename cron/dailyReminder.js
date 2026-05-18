@@ -1,7 +1,26 @@
 const cron = require('node-cron');
+
 const Patient = require('../models/Patient');
 const TreatmentLog = require('../models/TreatmentLog');
+const Setting = require('../models/Setting');
+
 const transporter = require('../config/email');
+
+/**
+ * Check whether email notifications are enabled
+ */
+const areEmailNotificationsEnabled = async () => {
+  try {
+    const setting = await Setting.findOne({
+      key: 'email_notifications_enabled',
+    }).lean();
+
+    return setting?.value === true;
+  } catch (error) {
+    console.error('Failed to check email notification setting:', error);
+    return false;
+  }
+};
 
 /**
  * Send reminder email
@@ -26,6 +45,17 @@ const sendReminderEmail = async (patient, message) => {
  */
 const dailyReminder = async () => {
   try {
+    const notificationsEnabled =
+      await areEmailNotificationsEnabled();
+
+    if (!notificationsEnabled) {
+      console.log(
+        'Email notifications disabled, skipping daily reminder'
+      );
+
+      return;
+    }
+
     const today = new Date();
 
     const twoDaysAgo = new Date(
@@ -43,10 +73,7 @@ const dailyReminder = async () => {
 
       // Patient missed medication for 2+ days
       if (!lastLog || lastLog.date < twoDaysAgo) {
-
-        // OPTIONAL:
         // prevent duplicate reminders within 24 hours
-
         if (
           patient.lastReminderSent &&
           new Date(patient.lastReminderSent) >
@@ -79,7 +106,19 @@ const dailyReminder = async () => {
  */
 const nextDayReminder = async () => {
   try {
+    const notificationsEnabled =
+      await areEmailNotificationsEnabled();
+
+    if (!notificationsEnabled) {
+      console.log(
+        'Email notifications disabled, skipping next-day reminder'
+      );
+
+      return;
+    }
+
     const tomorrow = new Date();
+
     tomorrow.setDate(tomorrow.getDate() + 1);
 
     // start/end of tomorrow

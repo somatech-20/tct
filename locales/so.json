@@ -52,5 +52,8 @@
   "settings": "Dejinta",
   "english": "Ingiriis",
   "arabic": "Carabi",
-  "somali": "Soomaali"
+  "somali": "Soomaali",
+  "email_notifications": "Walaalinta Email",
+  "enable_email_notifications": "Dareer Walaalinta Email",
+  "enable_email_reminders": "Dareer Xusuusinta Email"
 }

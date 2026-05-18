@@ -3,6 +3,7 @@ const TreatmentLog = require('../models/TreatmentLog');
 const Contact = require('../models/Contact');
 const json2csv = require('json2csv').parse;
 const ExcelJS = require('exceljs');
+const PDFDocument = require('pdfkit');
 
 exports.exportCSV = async (req, res) => {
   const patients = await Patient.find().lean();
@@ -30,6 +31,46 @@ exports.exportExcel = async (req, res) => {
   res.setHeader('Content-Disposition', 'attachment; filename=patients.xlsx');
   await workbook.xlsx.write(res);
   res.end();
+};
+
+exports.exportPDF = async (req, res) => {
+  try {
+    const patients = await Patient.find().lean();
+    const doc = new PDFDocument({ margin: 30 });
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', 'attachment; filename=patients.pdf');
+    doc.pipe(res);
+
+    // Header
+    doc.fontSize(18).text('TB Patients Report', { align: 'center' });
+    doc.moveDown();
+
+    // Table headers
+    const startX = 30;
+    let y = doc.y;
+    doc.fontSize(10);
+    doc.text('Name', startX, y);
+    doc.text('Age/Gender', startX + 150, y);
+    doc.text('TB Type', startX + 250, y);
+    doc.text('Status', startX + 350, y);
+    doc.moveDown();
+    y = doc.y;
+    doc.moveTo(startX, y).lineTo(startX + 500, y).stroke();
+
+    // Rows
+    patients.forEach(p => {
+      doc.text(p.fullName, startX, doc.y);
+      doc.text(`${p.age} / ${p.gender}`, startX + 150, doc.y - 12);
+      doc.text(p.tbType, startX + 250, doc.y - 12);
+      doc.text(p.status, startX + 350, doc.y - 12);
+      doc.moveDown();
+    });
+
+    doc.end();
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('PDF generation failed');
+  }
 };
 
 exports.list = async (req, res) => {

@@ -11,11 +11,21 @@ const crypto = require('crypto');
 const i18n = require('i18n');
 require('./cron/dailyReminder');
 
+// const Setting = require('./models/Setting');
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Connect to MongoDB
 connectDB();
+
+// // ensure email notification setting exists
+// (async () => {
+//   const emailsEnabled = await Setting.findOne({ key: 'email_notifications_enabled' });
+//   if (!emailsEnabled) {
+//     await Setting.create({ key: 'email_notifications_enabled', value: true });
+//   }
+// })();
 
 // Generate nonce for each request
 app.use((req, res, next) => {
@@ -156,6 +166,33 @@ app.get('/test-email', async (req, res) => {
     console.error(error);
     res.status(500).send('Failed to execute test job');
   }
+});
+
+const User = require('./models/User');
+
+// API endpoint for email setting (for admin only)
+app.get('/api/settings/email', async (req, res) => {
+  if (!req.session.userId) return res.status(401).json({ error: 'Unauthorized' });
+  const user = await User.findById(req.session.userId);
+  if (user.role !== 'admin') return res.status(403).json({ error: 'Forbidden' });
+  const Setting = require('./models/Setting');
+  const setting = await Setting.findOne({ key: 'email_notifications_enabled' });
+  res.json({ enabled: setting ? setting.value : true });
+});
+
+// POST endpoint to update email setting
+app.post('/api/settings/email', async (req, res) => {
+  if (!req.session.userId) return res.status(401).json({ error: 'Unauthorized' });
+  const user = await User.findById(req.session.userId);
+  if (user.role !== 'admin') return res.status(403).json({ error: 'Forbidden' });
+  const { enabled } = req.body;
+  const Setting = require('./models/Setting');
+  await Setting.findOneAndUpdate(
+    { key: 'email_notifications_enabled' },
+    { value: enabled === true },
+    { upsert: true }
+  );
+  res.json({ success: true });
 });
 
 // 404 handler

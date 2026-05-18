@@ -52,5 +52,8 @@
   "settings": "الإعدادات",
   "english": "الإنجليزية",
   "arabic": "العربية",
-  "somali": "الصومالية"
+  "somali": "الصومالية",
+  "email_notifications": "إشعارات البريد الإلكتروني",
+  "enable_email_notifications": "تمكين إشعارات البريد الإلكتروني",
+  "enable_email_reminders": "تمكين تذكيرات البريد الإلكتروني"
 }

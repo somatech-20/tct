@@ -13,5 +13,6 @@ router.put('/:id', isAuthenticated, isDoctor, validatePatient, patientController
 router.delete('/:id', isAuthenticated, isDoctor, patientController.delete);
 router.get('/export/csv', isAuthenticated, patientController.exportCSV);
 router.get('/export/excel', isAuthenticated, patientController.exportExcel);
+router.get('/export/pdf', isAuthenticated, patientController.exportPDF);
 
 module.exports = router;

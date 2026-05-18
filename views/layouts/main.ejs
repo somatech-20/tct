@@ -409,6 +409,19 @@
                     <option value="so" <%=locale==='so' ? 'selected' : '' %>>Soomaali</option>
                 </select>
             </div>
+            <% if (user && user.role==='admin' ) { %>
+                <div class="mb-6 border-t pt-4 mt-4">
+                    <h4 class="font-semibold mb-2">
+                        <%= t('email_notifications') %>
+                    </h4>
+                    <label class="flex items-center justify-between">
+                        <span>
+                            <%= t('enable_email_reminders') %>
+                        </span>
+                        <input type="checkbox" id="emailNotificationsToggle" class="toggle-switch">
+                    </label>
+                </div>
+                <% } %>
         </div>
     </div>
 
@@ -475,74 +488,129 @@
             }
         });
 
-        // ========== MODAL & SETTINGS ==========
         document.addEventListener('DOMContentLoaded', () => {
-            const settingsBtn = document.getElementById('settingsButton');
-            const modal = document.getElementById('settingsModal');
-            const closeModalBtn = document.getElementById('closeModal');
-            if (settingsBtn && modal) {
+            const $ = (id) => document.getElementById(id);
+
+            const settingsBtn = $('settingsButton');
+            const settingsModal = $('settingsModal');
+            const closeModalBtn = $('closeModal');
+
+            const langDropdownBtn = $('langDropdownBtn');
+            const langDropdownMenu = $('langDropdownMenu');
+
+            const themeButtons = document.querySelectorAll('.theme-btn');
+            const languageSwitchers = [
+                $('modalLangSwitcher'),
+                $('headerLangSwitcher')
+            ].filter(Boolean);
+
+            const getReturnUrl = () =>
+                `${window.location.pathname}${window.location.search}`;
+
+            const redirectToLanguage = (lang) => {
+                window.location.href =
+                    `/set-lang?lang=${encodeURIComponent(lang)}&return=${encodeURIComponent(getReturnUrl())}`;
+            };
+
+            const toggleHidden = (element, hidden) => {
+                element?.classList.toggle('hidden', hidden);
+            };
+
+            // Modal
+            if (settingsBtn && settingsModal) {
                 settingsBtn.addEventListener('click', (e) => {
                     e.preventDefault();
-                    modal.classList.remove('hidden');
+                    toggleHidden(settingsModal, false);
                 });
-                closeModalBtn.addEventListener('click', () => modal.classList.add('hidden'));
-                window.addEventListener('click', (e) => { if (e.target === modal) modal.classList.add('hidden'); });
+
+                closeModalBtn?.addEventListener('click', () => {
+                    toggleHidden(settingsModal, true);
+                });
+
+                window.addEventListener('click', (e) => {
+                    if (e.target === settingsModal) {
+                        toggleHidden(settingsModal, true);
+                    }
+                });
             }
 
-            function handleLanguageChange(lang) {
-                const returnUrl =
-                    window.location.pathname + window.location.search;
-
-                window.location.href =
-                    `/set-lang?lang=${encodeURIComponent(lang)}&return=${encodeURIComponent(returnUrl)}`;
-            }
-
-            ['modalLangSwitcher', 'headerLangSwitcher'].forEach(id => {
-                const el = document.getElementById(id);
-
-                if (el) {
-                    el.addEventListener('change', (e) => {
-                        handleLanguageChange(e.target.value);
-                    });
-                }
+            // Language Switchers
+            languageSwitchers.forEach((switcher) => {
+                switcher.addEventListener('change', ({ target }) => {
+                    redirectToLanguage(target.value);
+                });
             });
 
-            // Language switcher inside modal
-            const modalLang = document.getElementById('modalLangSwitcher');
-            if (modalLang) {
-                modalLang.addEventListener('change', (e) => {
-                    handleLanguageChange(e.target.value);
+            // Language Dropdown
+            if (langDropdownBtn && langDropdownMenu) {
+                langDropdownBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    langDropdownMenu.classList.toggle('hidden');
+                });
+
+                document.addEventListener('click', ({ target }) => {
+                    const clickedOutside =
+                        !langDropdownBtn.contains(target) &&
+                        !langDropdownMenu.contains(target);
+
+                    if (clickedOutside) {
+                        toggleHidden(langDropdownMenu, true);
+                    }
+                });
+
+                document
+                    .querySelectorAll('#langDropdownMenu a')
+                    .forEach((link) => {
+                        link.addEventListener('click', (e) => {
+                            e.preventDefault();
+                            redirectToLanguage(link.dataset.lang);
+                        });
+                    });
+            }
+
+            // Load email notification setting if admin
+            if (document.getElementById('emailNotificationsToggle')) {
+                const toggle = document.getElementById('emailNotificationsToggle');
+                // Fetch current setting
+                fetch('/api/settings/email')
+                    .then(res => res.json())
+                    .then(data => {
+                        toggle.checked = data.enabled;
+                    })
+                    .catch(err => console.error('Failed to load email setting:', err));
+
+                // On change, update server
+                toggle.addEventListener('change', (e) => {
+                    const enabled = e.target.checked;
+                    fetch('/api/settings/email', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ enabled })
+                    }).then(res => res.json()).then(data => {
+                        if (data.success) console.log('Email setting updated');
+                    }).catch(err => console.error('Failed to update email setting:', err));
                 });
             }
 
-            // Language switcher in header (same logic)
-            const headerLang = document.getElementById('headerLangSwitcher');
-            if (headerLang) {
-                headerLang.addEventListener('change', (e) => {
-                    handleLanguageChange(e.target.value);
-                });
-            }
+            // Theme Switching
+            themeButtons.forEach((button) => {
+                button.addEventListener('click', () => {
+                    const selectedTheme = button.dataset.theme;
 
-            // Theme buttons (no inline onclick)
-            const themeBtns = document.querySelectorAll('.theme-btn');
-            themeBtns.forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const theme = btn.dataset.theme;
-                    updateTheme(theme);
-                    // Update active class without reload
-                    themeBtns.forEach(b => {
-                        if (b.dataset.theme === theme) {
-                            b.classList.add('bg-indigo-600', 'text-white');
-                            b.classList.remove('bg-gray-200', 'dark:bg-gray-700');
-                        } else {
-                            b.classList.remove('bg-indigo-600', 'text-white');
-                            b.classList.add('bg-gray-200', 'dark:bg-gray-700');
-                        }
+                    updateTheme(selectedTheme);
+
+                    themeButtons.forEach((btn) => {
+                        const isActive = btn.dataset.theme === selectedTheme;
+
+                        btn.classList.toggle('bg-indigo-600', isActive);
+                        btn.classList.toggle('text-white', isActive);
+
+                        btn.classList.toggle('bg-gray-200', !isActive);
+                        btn.classList.toggle('dark:bg-gray-700', !isActive);
                     });
                 });
             });
         });
-
         // ========== LOADING SPINNER ==========
         document.querySelectorAll('form').forEach(form => {
             form.addEventListener('submit', () => {

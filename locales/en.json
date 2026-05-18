@@ -52,5 +52,8 @@
   "settings": "Settings",
   "english": "English",
   "arabic": "Arabic",
-  "somali": "Somali"
+  "somali": "Somali",
+  "email_notifications": "Email Notifications",
+  "enable_email_notifications": "Enable Email Notifications",
+  "enable_email_reminders": "Enable Email Reminders"
 }
