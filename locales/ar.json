@@ -55,5 +55,6 @@
   "somali": "الصومالية",
   "email_notifications": "إشعارات البريد الإلكتروني",
   "enable_email_notifications": "تمكين إشعارات البريد الإلكتروني",
-  "enable_email_reminders": "تمكين تذكيرات البريد الإلكتروني"
+  "enable_email_reminders": "تمكين تذكيرات البريد الإلكتروني",
+  "add_user": "إضافة مستخدم"
 }
