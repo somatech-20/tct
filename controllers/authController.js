@@ -2,7 +2,7 @@ const bcrypt = require('bcrypt');
 const User = require('../models/User');
 
 exports.getLogin = (req, res) => {
-  res.render('auth/login', { error: null, layout: false});
+  res.render('auth/login', { error: null, layout: false });
 };
 
 // Refactored to redirect with query params instead of rendering login page again
@@ -21,6 +21,9 @@ exports.postLogin = async (req, res) => {
     req.session.userId = user._id;
     req.session.userRole = user.role;
     req.session.username = user.username;
+    req.session.preferredExportFormat = user.preferredExportFormat || 'pdf'; // store preferred export format in session
+    // const userRecord = await User.findById(user._id);
+    // req.session.preferredExportFormat = userRecord.preferredExportFormat;
     res.redirect('/dashboard');
   } catch (err) {
     console.error(err);

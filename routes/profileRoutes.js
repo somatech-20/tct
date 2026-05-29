@@ -5,5 +5,6 @@ const profileController = require('../controllers/profileController');
 
 router.get('/', isAuthenticated, profileController.show);
 router.post('/password', isAuthenticated, profileController.updatePassword);
+router.post('/export-format', isAuthenticated, profileController.updateExportFormat);
 
 module.exports = router;

@@ -90,6 +90,7 @@ app.use((req, res, next) => {
         id: req.session.userId,
         role: req.session.userRole,
         username: req.session.username,
+        preferredExportFormat: req.session.preferredExportFormat || 'pdf'
       }
     : null;
 
