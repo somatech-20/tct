@@ -58,6 +58,8 @@
   "enable_email_reminders": "Enable Email Reminders",
   "add_user": "Add User",
   "treatment-start": "Treatment Start",
-  "exprt_settings": "Export Settings",
-  "preferred_export_format": "Preferred Export Format"
+  "export_settings": "Export Settings",
+  "preferred_export_format": "Preferred Export Format",
+  "default_export_format": "Default Export Format",
+  "export": "Export"
 }

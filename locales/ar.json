@@ -58,6 +58,8 @@
   "enable_email_reminders": "تمكين تذكيرات البريد الإلكتروني",
   "add_user": "إضافة مستخدم",
   "treatment-start": "بدء العلاج",
-  "exprt_settings": "إعدادات التصدير",
-  "preferred_export_format": "تنسيق التصدير المفضل"
+  "export_settings": "إعدادات التصدير",
+  "preferred_export_format": "تنسيق التصدير المفضل",
+  "default_export_format": "تنسيق التصدير الافتراضي",
+  "export": "تصدير"
 }

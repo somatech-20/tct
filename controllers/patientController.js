@@ -73,6 +73,75 @@ exports.exportPDF = async (req, res) => {
   }
 };
 
+exports.exportOne = async (req, res) => {
+  try {
+    const patient = await Patient.findById(req.params.id).lean();
+    if (!patient) return res.status(404).send('Patient not found');
+    const treatments = await TreatmentLog.find({ patient: patient._id }).lean();
+    const contacts = await Contact.find({ patient: patient._id }).lean();
+
+    // const format = req.session.preferredExportFormat || 'pdf'; // from session
+    const format =
+      req.session &&
+        req.session.preferredExportFormat
+        ? req.session.preferredExportFormat
+        : 'pdf';
+
+    if (format === 'csv') {
+      const combined = [{ ...patient, treatments: JSON.stringify(treatments), contacts: JSON.stringify(contacts) }];
+      const csv = json2csv(combined);
+      res.header('Content-Type', 'text/csv');
+      res.attachment(`patient_${patient._id}.csv`);
+      return res.send(csv);
+    }
+
+    if (format === 'excel') {
+      const workbook = new ExcelJS.Workbook();
+      const ws = workbook.addWorksheet('Patient');
+      ws.addRows([patient]);
+      // Add separate sheets for treatments and contacts
+      const wsTreat = workbook.addWorksheet('Treatments');
+      wsTreat.addRows(treatments);
+      const wsCont = workbook.addWorksheet('Contacts');
+      wsCont.addRows(contacts);
+      res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+      res.setHeader('Content-Disposition', `attachment; filename=patient_${patient._id}.xlsx`);
+      return workbook.xlsx.write(res).then(() => res.end());
+    }
+
+    // Default PDF
+    const doc = new PDFDocument({ margin: 30 });
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename=patient_${patient._id}.pdf`);
+    doc.pipe(res);
+
+    doc.fontSize(18).text('Patient Details', { align: 'center' }).moveDown();
+    doc.fontSize(12).text(`Name: ${patient.fullName}`);
+    doc.text(`Age: ${patient.age} / Gender: ${patient.gender}`);
+    doc.text(`Address: ${patient.address}`);
+    doc.text(`TB Type: ${patient.tbType}`);
+    doc.text(`Start Date: ${patient.treatmentStartDate.toDateString()}`);
+    doc.text(`Status: ${patient.status}`);
+    doc.moveDown();
+
+    doc.fontSize(16).text('Treatment Logs', { underline: true }).moveDown();
+    treatments.forEach(log => {
+      doc.text(`${log.date.toDateString()} - Dose Taken: ${log.doseTaken ? 'Yes' : 'No'}, Sputum: ${log.sputumResult}`);
+    });
+    doc.moveDown();
+
+    doc.fontSize(16).text('Contacts', { underline: true }).moveDown();
+    contacts.forEach(contact => {
+      doc.text(`${contact.fullName} (${contact.relationship}) - Screened: ${contact.screeningDate.toDateString()}, Status: ${contact.screeningStatus}`);
+    });
+
+    doc.end();
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Export failed');
+  }
+};
+
 exports.list = async (req, res) => {
   try {
     const patients = await Patient.find().sort('-createdAt');

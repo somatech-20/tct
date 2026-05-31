@@ -87,17 +87,30 @@ app.use((req, res, next) => {
 
   res.locals.user = req.session.userId
     ? {
-        id: req.session.userId,
-        role: req.session.userRole,
-        username: req.session.username,
-        preferredExportFormat: req.session.preferredExportFormat || 'pdf'
-      }
+      id: req.session.userId,
+      role: req.session.userRole,
+      username: req.session.username,
+      preferredExportFormat: req.session.preferredExportFormat || 'pdf'
+    }
     : null;
 
   res.locals.currentPath = req.path;
 
   next();
 });
+
+// log session info for debugging
+// app.use((req, res, next) => {
+//   console.log('Session Info:', {
+//     userId: req.session.userId,
+//     userRole: req.session.userRole,
+//     username: req.session.username,
+//     preferredExportFormat: req.session.preferredExportFormat,
+//     lang: req.session.lang,
+//     theme: req.session.theme
+//   });
+//   next();
+// });
 
 // Static files
 app.use(express.static(path.join(__dirname, 'public')));
@@ -209,6 +222,23 @@ app.use((err, req, res, next) => {
 
 app.listen(PORT, () => {
   console.log(`Server running on: http://localhost:${PORT}`);
-  // console.log(process.env.MONGODB_URI);
-  console.log(process.env.NODE_ENV);
+  // log process memory usage for debugging
+  // const memoryUsage = process.memoryUsage();
+  // console.log('Memory Usage:', {
+  //   rss: `${(memoryUsage.rss / 1024 / 1024).toFixed(2)} MB`,
+  //   heapTotal: `${(memoryUsage.heapTotal / 1024 / 1024).toFixed(2)} MB`,
+  //   heapUsed: `${(memoryUsage.heapUsed / 1024 / 1024).toFixed(2)} MB`,
+  //   external: `${(memoryUsage.external / 1024 / 1024).toFixed(2)} MB`
+  // });
+
+  // // log memory usage every 10 seconds to monitor for leaks
+  // setInterval(() => {
+  //   const usage = process.memoryUsage();
+  //   const mb = (n) => (n / 1024 / 1024).toFixed(2);
+  //   console.log(`RSS: ${mb(usage.rss)} MB | Heap: ${mb(usage.heapUsed)}/${mb(usage.heapTotal)} MB | Ext: ${mb(usage.external)} MB`);
+  // }, 10000);
+
+  // log MODE_ENV for debugging in color green if production, yellow if development
+  console.log('Environment:', process.env.NODE_ENV === 'production' ? '\x1b[32mProduction\x1b[0m' : '\x1b[33mDevelopment\x1b[0m');
+  console.log('Press Ctrl+C to quit');
 });
