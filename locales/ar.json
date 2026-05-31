@@ -61,5 +61,6 @@
   "export_settings": "إعدادات التصدير",
   "preferred_export_format": "تنسيق التصدير المفضل",
   "default_export_format": "تنسيق التصدير الافتراضي",
-  "export": "تصدير"
+  "export": "تصدير",
+  "log_in": "تسجيل الدخول"
 }

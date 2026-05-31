@@ -61,5 +61,6 @@
   "export_settings": "Dooro Qaabka Galka",
   "preferred_export_format": "Qaabka gal ee aad doorbido",
   "default_export_format": "Qaabka gal ee doran",
-  "export": "La deg"
+  "export": "La deg",
+  "log_in": "Gal"
 }
