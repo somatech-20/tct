@@ -57,7 +57,7 @@
   "enable_email_notifications": "Dareer Walaalinta Email",
   "enable_email_reminders": "Dareer Xusuusinta Email",
   "add_user": "Ku dar Isticmaalaha",
-  "treatment-start": "Bilowga Daaweynta",
+  "treatment_start": "Bilowga Daaweynta",
   "export_settings": "Dooro Qaabka Galka",
   "preferred_export_format": "Qaabka gal ee aad doorbido",
   "default_export_format": "Qaabka gal ee doran",

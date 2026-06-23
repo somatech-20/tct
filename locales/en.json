@@ -57,7 +57,7 @@
   "enable_email_notifications": "Enable Email Notifications",
   "enable_email_reminders": "Enable Email Reminders",
   "add_user": "Add User",
-  "treatment-start": "Treatment Start",
+  "treatment_start": "Treatment Start",
   "export_settings": "Export Settings",
   "preferred_export_format": "Preferred Export Format",
   "default_export_format": "Default Export Format",

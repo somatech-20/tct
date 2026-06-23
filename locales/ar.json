@@ -57,7 +57,7 @@
   "enable_email_notifications": "تمكين إشعارات البريد الإلكتروني",
   "enable_email_reminders": "تمكين تذكيرات البريد الإلكتروني",
   "add_user": "إضافة مستخدم",
-  "treatment-start": "بدء العلاج",
+  "treatment_start": "بدء العلاج",
   "export_settings": "إعدادات التصدير",
   "preferred_export_format": "تنسيق التصدير المفضل",
   "default_export_format": "تنسيق التصدير الافتراضي",
