@@ -20,15 +20,15 @@
     <div class="overflow-x-auto">
         <table class="min-w-full divide-y divide-gray-200">
             <thead>
-                <tr><th>Date</th><th>Dose Taken</th><th>Sputum Result</th><th>Notes</th></tr>
+                <tr><th class="px-4 py-3 text-left">Date</th><th class="px-4 py-3 text-left">Dose Taken</th><th class="px-4 py-3 text-left">Sputum Result</th><th class="px-4 py-3 text-left">Notes</th></tr>
             </thead>
             <tbody>
                 <% treatments.forEach(log => { %>
                 <tr>
-                    <td><%= log.date.toDateString() %></td>
-                    <td><%= log.doseTaken ? 'Yes' : 'No' %></td>
-                    <td><%= log.sputumResult %></td>
-                    <td><%= log.notes || '' %></td>
+                    <td class="px-4 py-3"><%= log.date.toDateString() %></td>
+                    <td class="px-4 py-3"><%= log.doseTaken ? 'Yes' : 'No' %></td>
+                    <td class="px-4 py-3"><%= log.sputumResult %></td>
+                    <td class="px-4 py-3"><%= log.notes || '' %></td>
                 </tr>
                 <% }); %>
             </tbody>
@@ -44,16 +44,16 @@
     <div class="overflow-x-auto">
         <table class="min-w-full divide-y divide-gray-200">
             <thead>
-                <tr><th>Name</th><th>Relationship</th><th>Screening Date</th><th>Symptoms</th><th>Status</th></tr>
+                <tr><th class="px-4 py-3 text-left">Name</th><th class="px-4 py-3 text-left">Relationship</th><th class="px-4 py-3 text-left">Screening Date</th><th class="px-4 py-3 text-left">Symptoms</th><th class="px-4 py-3 text-left">Status</th></tr>
             </thead>
             <tbody>
                 <% contacts.forEach(contact => { %>
                 <tr>
-                    <td><%= contact.fullName %></td>
-                    <td><%= contact.relationship %></td>
-                    <td><%= contact.screeningDate.toDateString() %></td>
-                    <td><%= contact.symptoms || '' %></td>
-                    <td><%= contact.screeningStatus %></td>
+                    <td class="px-4 py-3"><%= contact.fullName %></td>
+                    <td class="px-4 py-3"><%= contact.relationship %></td>
+                    <td class="px-4 py-3"><%= contact.screeningDate.toDateString() %></td>
+                    <td class="px-4 py-3"><%= contact.symptoms || '' %></td>
+                    <td class="px-4 py-3"><%= contact.screeningStatus %></td>
                 </tr>
                 <% }); %>
             </tbody>
