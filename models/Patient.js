@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const patientSchema = new mongoose.Schema({
-  email: { type: String, required: false },
+  email: { type: String, required: false, unique: true, sparse: true }, // unique and sparse index for email. Coz we need it to notify patients via email and those who don't have one are exempt.
   phone: { type: String, required: false },
   fullName: { type: String, required: true },
   age: { type: Number, required: true },
@@ -14,5 +14,15 @@ const patientSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now },
   lastReminderSent: { type: Date, default: null }
 });
+
+// // Add a unique index with case‑insensitive collation
+// patientSchema.index(
+//   { fullName: 1 },
+//   {
+//     unique: true,
+//     collation: { locale: 'en', strength: 2 }, // case‑insensitive
+//     partialFilterExpression: { fullName: { $exists: true } }
+//   }
+// );
 
 module.exports = mongoose.model('Patient', patientSchema);

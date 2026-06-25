@@ -7,7 +7,7 @@ const PDFDocument = require('pdfkit');
 
 exports.exportCSV = async (req, res) => {
   const patients = await Patient.find().lean();
-  const fields = ['fullName', 'age', 'gender', 'tbType', 'status', 'treatmentStartDate'];
+  const fields = ['fullName', 'email', 'phone', 'address', 'age', 'gender', 'tbType', 'status', 'treatmentStartDate'];
   const csv = json2csv(patients, { fields });
   res.header('Content-Type', 'text/csv');
   res.attachment('patients.csv');
@@ -20,6 +20,9 @@ exports.exportExcel = async (req, res) => {
   const worksheet = workbook.addWorksheet('Patients');
   worksheet.columns = [
     { header: 'Name', key: 'fullName', width: 30 },
+    { header: 'Email', key: 'email', width: 30 },
+    { header: 'Phone', key: 'phone', width: 15 },
+    { header: 'Address', key: 'address', width: 50 },
     { header: 'Age', key: 'age', width: 10 },
     { header: 'Gender', key: 'gender', width: 10 },
     { header: 'TB Type', key: 'tbType', width: 20 },
@@ -33,38 +36,155 @@ exports.exportExcel = async (req, res) => {
   res.end();
 };
 
+// Rather *landscape PDF export all patients w email and phone.
 exports.exportPDF = async (req, res) => {
   try {
     const patients = await Patient.find().lean();
-    const doc = new PDFDocument({ margin: 30 });
+
+    const doc = new PDFDocument({
+      margin: 30,
+      size: 'A4',
+      layout: 'landscape'
+    });
+
     res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', 'attachment; filename=patients.pdf');
+    res.setHeader(
+      'Content-Disposition',
+      'attachment; filename=patients.pdf'
+    );
+
     doc.pipe(res);
 
-    // Header
-    doc.fontSize(18).text('TB Patients Report', { align: 'center' });
-    doc.moveDown();
-
-    // Table headers
     const startX = 30;
-    let y = doc.y;
-    doc.fontSize(10);
-    doc.text('Name', startX, y);
-    doc.text('Age/Gender', startX + 150, y);
-    doc.text('TB Type', startX + 250, y);
-    doc.text('Status', startX + 350, y);
-    doc.moveDown();
-    y = doc.y;
-    doc.moveTo(startX, y).lineTo(startX + 500, y).stroke();
+    const tableWidth = 760;
 
-    // Rows
-    patients.forEach(p => {
-      doc.text(p.fullName, startX, doc.y);
-      doc.text(`${p.age} / ${p.gender}`, startX + 150, doc.y - 12);
-      doc.text(p.tbType, startX + 250, doc.y - 12);
-      doc.text(p.status, startX + 350, doc.y - 12);
-      doc.moveDown();
+    // Report Header
+    doc
+      .fontSize(22)
+      .fillColor('#2C3E50')
+      .text('TB Patients Report', {
+        align: 'center'
+      });
+
+    doc
+      .fontSize(10)
+      .fillColor('#666666')
+      .text(
+        `Generated: ${new Date().toLocaleString()}`,
+        {
+          align: 'center'
+        }
+      );
+
+    doc.moveDown(2);
+
+    // Table Header
+    const drawTableHeader = (y) => {
+      doc
+        .rect(startX, y, 760, 22)
+        .fill('#2C3E50');
+
+      doc
+        .fillColor('#FFFFFF')
+        .fontSize(10);
+
+      doc.text('Name', 35, y + 6, { width: 120 });
+      doc.text('Phone', 160, y + 6, { width: 100 });
+      doc.text('Email', 265, y + 6, { width: 180 });
+      doc.text('Age/Gender', 450, y + 6, { width: 80 });
+      doc.text('TB Type', 540, y + 6, { width: 100 });
+      doc.text('Status', 650, y + 6, { width: 80 });
+
+      doc.fillColor('#000000');
+
+      return y + 28;
+    };
+
+    // Table Row
+    const drawRow = (patient, y) => {
+      doc.fontSize(9);
+
+      doc.text(
+        patient.fullName || '-',
+        35,
+        y,
+        { width: 120 }
+      );
+
+      doc.text(
+        patient.phone || '-',
+        160,
+        y,
+        { width: 100 }
+      );
+
+      doc.text(
+        patient.email || '-',
+        265,
+        y,
+        { width: 180 }
+      );
+
+      doc.text(
+        `${patient.age || '-'} / ${patient.gender || '-'}`,
+        450,
+        y,
+        { width: 80 }
+      );
+
+      doc.text(
+        patient.tbType || '-',
+        540,
+        y,
+        { width: 100 }
+      );
+
+      doc.text(
+        patient.status || '-',
+        650,
+        y,
+        { width: 80 }
+      );
+    };
+
+    let y = drawTableHeader(doc.y);
+
+    // Patient Rows
+    patients.forEach((patient, index) => {
+      // page break
+      if (y > 740) {
+        doc.addPage();
+        y = drawTableHeader(30);
+      }
+
+      // zebra stripe
+      if (index % 2 === 0) {
+        doc
+          .rect(startX, y - 2, tableWidth, 20)
+          .fill('#F5F5F5');
+
+        doc.fillColor('#000000');
+      }
+
+      drawRow(patient, y);
+
+      y += 22;
     });
+
+    // Footer
+    doc.moveTo(startX, y + 10)
+      .lineTo(startX + tableWidth, y + 10)
+      .strokeColor('#CCCCCC')
+      .stroke();
+
+    doc
+      .fontSize(9)
+      .fillColor('#666666')
+      .text(
+        `Total Patients: ${patients.length}`,
+        startX,
+        y + 20
+      );
 
     doc.end();
   } catch (err) {
@@ -110,30 +230,169 @@ exports.exportOne = async (req, res) => {
     }
 
     // Default PDF
-    const doc = new PDFDocument({ margin: 30 });
+    const doc = new PDFDocument({
+      margin: 30,
+      size: 'A4'
+    });
+
     res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', `attachment; filename=patient_${patient._id}.pdf`);
+    res.setHeader(
+      'Content-Disposition',
+      `attachment; filename=patient_${patient._id}.pdf`
+    );
+
     doc.pipe(res);
 
-    doc.fontSize(18).text('Patient Details', { align: 'center' }).moveDown();
-    doc.fontSize(12).text(`Name: ${patient.fullName}`);
-    doc.text(`Age: ${patient.age} / Gender: ${patient.gender}`);
-    doc.text(`Address: ${patient.address}`);
-    doc.text(`TB Type: ${patient.tbType}`);
-    doc.text(`Start Date: ${patient.treatmentStartDate.toDateString()}`);
-    doc.text(`Status: ${patient.status}`);
-    doc.moveDown();
+    // HEADER
+    doc.rect(0, 0, doc.page.width, 80)
+      .fill('#2C3E50');
 
-    doc.fontSize(16).text('Treatment Logs', { underline: true }).moveDown();
-    treatments.forEach(log => {
-      doc.text(`${log.date.toDateString()} - Dose Taken: ${log.doseTaken ? 'Yes' : 'No'}, Sputum: ${log.sputumResult}`);
-    });
-    doc.moveDown();
+    doc
+      .fillColor('#FFFFFF')
+      .fontSize(24)
+      .text('TB Patient Report', 0, 28, {
+        align: 'center'
+      });
 
-    doc.fontSize(16).text('Contacts', { underline: true }).moveDown();
-    contacts.forEach(contact => {
-      doc.text(`${contact.fullName} (${contact.relationship}) - Screened: ${contact.screeningDate.toDateString()}, Status: ${contact.screeningStatus}`);
+    doc
+      .fontSize(10)
+      .text(
+        `Generated: ${new Date().toLocaleString()}`,
+        0,
+        58,
+        { align: 'center' }
+      );
+
+    let y = 110;
+
+    // SUMMARY CARD
+    doc
+      .roundedRect(30, y, 250, 95, 5)
+      .stroke('#2C3E50');
+
+    doc
+      .fillColor('#2C3E50')
+      .fontSize(14)
+      .text('Patient Summary', 45, y + 12);
+
+    doc
+      .fillColor('black')
+      .fontSize(11);
+
+    doc.text(`Name: ${patient.fullName}`, 45, y + 38);
+    doc.text(`Phone: ${patient.phone || 'N/A'}`, 45, y + 58);
+    doc.text(`Status: ${patient.status}`, 45, y + 78);
+
+    // DETAILS CAR
+    const detailX = 310;
+    const detailWidth = 255;
+
+    doc
+      .roundedRect(detailX, y, detailWidth, 160, 5)
+      .stroke('#D0D0D0');
+
+    doc
+      .fillColor('#2C3E50')
+      .fontSize(14)
+      .text('Patient Details', detailX + 15, y + 12);
+
+    const details = [
+      ['Email', patient.email || 'N/A'],
+      ['Age', patient.age],
+      ['Gender', patient.gender],
+      ['Address', patient.address],
+      ['TB Type', patient.tbType],
+      [
+        'Treatment Start',
+        new Date(patient.treatmentStartDate).toDateString()
+      ]
+    ];
+
+    let detailY = y + 40;
+
+    details.forEach(([label, value]) => {
+      doc
+        .fillColor('#666')
+        .fontSize(10)
+        .text(label, detailX + 15, detailY);
+
+      doc
+        .fillColor('#000')
+        .fontSize(11)
+        .text(String(value), detailX + 110, detailY);
+
+      detailY += 20;
     });
+
+    // TREATMENT LOGS
+    y = 300;
+
+    doc
+      .fillColor('#2C3E50')
+      .fontSize(18)
+      .text('Treatment Logs', 30, y);
+
+    y += 30;
+
+    if (treatments.length === 0) {
+      doc
+        .fontSize(11)
+        .fillColor('#666')
+        .text('No treatment logs available.', 30, y);
+
+      y += 20;
+    } else {
+      treatments.forEach((log, index) => {
+        doc
+          .rect(30, y - 3, 535, 22)
+          .fill(index % 2 === 0 ? '#F8F9FA' : '#FFFFFF');
+
+        doc.fillColor('black');
+
+        doc.text(
+          `${new Date(log.date).toDateString()}  |  Dose Taken: ${log.doseTaken ? 'Yes' : 'No'
+          }  |  Sputum: ${log.sputumResult}`,
+          40,
+          y + 3
+        );
+
+        y += 24;
+      });
+    }
+
+    // CONTACTS
+    y += 30;
+
+    doc
+      .fillColor('#2C3E50')
+      .fontSize(18)
+      .text('Contacts', 30, y);
+
+    y += 30;
+
+    if (contacts.length === 0) {
+      doc
+        .fontSize(11)
+        .fillColor('#666')
+        .text('No contacts recorded.', 30, y);
+    } else {
+      contacts.forEach((contact, index) => {
+        doc
+          .rect(30, y - 3, 535, 22)
+          .fill(index % 2 === 0 ? '#F8F9FA' : '#FFFFFF');
+
+        doc.fillColor('black');
+
+        doc.text(
+          `${contact.fullName} (${contact.relationship}) | Screened: ${new Date(contact.screeningDate).toDateString()
+          } | Status: ${contact.screeningStatus}`,
+          40,
+          y + 3
+        );
+
+        y += 24;
+      });
+    }
 
     doc.end();
   } catch (err) {
