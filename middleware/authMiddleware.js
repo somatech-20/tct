@@ -19,4 +19,18 @@ const isDoctor = (req, res, next) => {
   res.status(403).send('Access denied. Doctor privileges required.');
 };
 
-module.exports = { isAuthenticated, isDoctor, isAdmin };
+const isReceptionist = (req, res, next) => {
+  if (req.session.userRole === 'receptionist') {
+    return next();
+  }
+  res.status(403).send('Access denied. Receptionist privileges required.');
+}
+
+const isDoctorOrReceptionist = (req, res, next) => {
+  if (req.session.userRole === 'doctor' || req.session.userRole === 'receptionist') {
+    return next();
+  }
+  res.status(403).send('Access denied. Doctor or Receptionist privileges required.');
+};
+
+module.exports = { isAuthenticated, isDoctor, isAdmin, isReceptionist, isDoctorOrReceptionist };

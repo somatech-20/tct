@@ -1,9 +1,7 @@
 /node_modules
-/*.sh
-/createUser.js
+/scrs
 /.env
 /hola
 /public/css
 /package-lock.json
 /.olds
-/migr.js

@@ -4,6 +4,7 @@ const Contact = require('../models/Contact');
 const json2csv = require('json2csv').parse;
 const ExcelJS = require('exceljs');
 const PDFDocument = require('pdfkit');
+const User = require('../models/User');
 
 exports.exportCSV = async (req, res) => {
   const patients = await Patient.find().lean();
@@ -401,22 +402,72 @@ exports.exportOne = async (req, res) => {
   }
 };
 
+// exports.list = async (req, res) => {
+//   try {
+//     const patients = await Patient.find().sort('-createdAt');
+//     res.render('patients/list', { patients });
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).send('Server Error');
+//   }
+// };
+
+// List - populate assignedDoctor and registeredBy
 exports.list = async (req, res) => {
   try {
-    const patients = await Patient.find().sort('-createdAt');
-    res.render('patients/list', { patients });
+    const { search, status, district, returnee } = req.query;
+    const filter = {};
+
+    // Status filter
+    if (status && status !== '') {
+      filter.status = status;
+    }
+
+    // District filter
+    if (district && district !== '') {
+      filter.district = district;
+    }
+
+    // Returnee filter
+    if (returnee && returnee !== '') {
+      filter.isReturnee = returnee === 'true';
+    }
+
+    // Search filter (name, phone, email)
+    if (search && search !== '') {
+      filter.$or = [
+        { fullName: { $regex: search, $options: 'i' } },
+        { phone: { $regex: search, $options: 'i' } },
+        { email: { $regex: search, $options: 'i' } }
+      ];
+    }
+
+    const patients = await Patient.find(filter)
+      .sort('-createdAt')
+      .populate('assignedDoctor', 'username fullName')
+      .populate('registeredBy', 'username fullName')
+      .populate('createdBy', 'username fullName');
+
+    res.render('patients/list', { patients, query: req.query });
   } catch (err) {
     console.error(err);
     res.status(500).send('Server Error');
   }
 };
 
+// Detail - already updated earlier
 exports.detail = async (req, res) => {
   try {
-    const patient = await Patient.findById(req.params.id);
+    const patient = await Patient.findById(req.params.id)
+      .populate('assignedDoctor', 'username fullName')
+      .populate('registeredBy', 'username fullName')
+      .populate('createdBy', 'username fullName');
+      
     if (!patient) return res.status(404).send('Patient not found');
+    
     const treatments = await TreatmentLog.find({ patient: patient._id }).sort('-date');
     const contacts = await Contact.find({ patient: patient._id });
+    
     res.render('patients/detail', { patient, treatments, contacts });
   } catch (err) {
     console.error(err);
@@ -424,38 +475,188 @@ exports.detail = async (req, res) => {
   }
 };
 
-exports.newForm = (req, res) => {
-  res.render('patients/form', { patient: null });
-};
+// exports.detail = async (req, res) => {
+//   try {
+//     const patient = await Patient.findById(req.params.id);
+//     if (!patient) return res.status(404).send('Patient not found');
+//     const treatments = await TreatmentLog.find({ patient: patient._id }).sort('-date');
+//     const contacts = await Contact.find({ patient: patient._id });
+//     res.render('patients/detail', { patient, treatments, contacts });
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).send('Server Error');
+//   }
+// };
 
-exports.create = async (req, res) => {
+exports.newForm = async (req, res) => {
   try {
-    const patientData = { ...req.body, createdBy: req.session.userId };
-    const patient = new Patient(patientData);
-    await patient.save();
-    res.redirect(`/patients/${patient._id}`);
+    // Allowin doctor or receptionist
+    if (req.session.userRole !== 'doctor' && req.session.userRole !== 'receptionist') {
+      return res.status(403).send('Access denied. Only doctors and receptionists can add patients.');
+    }
+    const doctors = await User.find({ role: 'doctor' }).select('username fullName');
+    res.render('patients/form', { patient: null, doctors });
   } catch (err) {
     console.error(err);
     res.status(500).send('Server Error');
   }
 };
 
-exports.editForm = async (req, res) => {
+// exports.create = async (req, res) => {
+//   try {
+//     if (req.session.userRole !== 'doctor' && req.session.userRole !== 'receptionist') {
+//       return res.status(403).send('Access denied. Only doctors and receptionists can register patients.');
+//     }
+//     const patientData = { ...req.body, createdBy: req.session.userId, registeredBy: req.session.userId };
+//     const patient = new Patient(patientData);
+//     await patient.save();
+//     res.redirect(`/patients/${patient._id}`);
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).send('Server Error');
+//   }
+// };
+
+// exports.update = async (req, res) => {
+//   try {
+//     // Allow receptionists to update patient info, and doctors can update treatment info
+//     // For now, we'll allow both roles to update basic patient data
+//     const patient = await Patient.findByIdAndUpdate(req.params.id, req.body, { new: true });
+//     if (!patient) return res.status(404).send('Patient not found');
+//     res.redirect(`/patients/${patient._id}`);
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).send('Server Error');
+//   }
+// };
+
+exports.create = async (req, res) => {
   try {
-    const patient = await Patient.findById(req.params.id);
-    if (!patient) return res.status(404).send('Patient not found');
-    res.render('patients/form', { patient });
+    // Only receptionists can create patients
+    if (req.session.userRole !== 'receptionist' && req.session.userRole !== 'doctor') {
+      return res.status(403).send('Only receptionists and doctors can register patients.');
+    }
+
+    // Extract emergency contact from form data
+    const patientData = {
+      ...req.body,
+      registeredBy: req.session.userId,
+      createdBy: req.session.userId,
+      // Ensure emergencyContact is properly structured
+      emergencyContact: {
+        name: req.body.emergencyContact?.name || '',
+        relationship: req.body.emergencyContact?.relationship || '',
+        phone: req.body.emergencyContact?.phone || ''
+      }
+    };
+
+    // Remove any empty emergency contact fields
+    if (!patientData.emergencyContact.name && 
+        !patientData.emergencyContact.relationship && 
+        !patientData.emergencyContact.phone) {
+      patientData.emergencyContact = undefined;
+    }
+
+    const patient = new Patient(patientData);
+    await patient.save();
+    res.redirect(`/patients/${patient._id}`);
   } catch (err) {
     console.error(err);
+    // Handle duplicate key error
+    if (err.code === 11000) {
+      return res.status(400).send('A patient with this name already exists. Please use a different name.');
+    }
     res.status(500).send('Server Error');
   }
 };
 
 exports.update = async (req, res) => {
   try {
-    const patient = await Patient.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    // Check permission
+    if (req.session.userRole !== 'receptionist' && req.session.userRole !== 'admin' && req.session.userRole !== 'doctor') {
+      return res.status(403).send('Access denied. Insufficient privileges.');
+    }
+
+    // Prepare update data
+    const updateData = {
+      fullName: req.body.fullName,
+      age: req.body.age,
+      gender: req.body.gender,
+      maritalStatus: req.body.maritalStatus || undefined,
+      district: req.body.district,
+      tbType: req.body.tbType,
+      treatmentStartDate: req.body.treatmentStartDate,
+      status: req.body.status || 'Active',
+      isReturnee: req.body.isReturnee === 'true' || req.body.isReturnee === true,
+      previousTreatmentDate: req.body.previousTreatmentDate || undefined,
+      email: req.body.email || undefined,
+      phone: req.body.phone || undefined,
+      // assignedDoctor - handle empty string
+      assignedDoctor: req.body.assignedDoctor && req.body.assignedDoctor !== '' ? req.body.assignedDoctor : undefined,
+      emergencyContact: {
+        name: req.body.emergencyContact?.name || '',
+        relationship: req.body.emergencyContact?.relationship || '',
+        phone: req.body.emergencyContact?.phone || ''
+      }
+    };
+
+    // Remove empty emergency contact
+    if (!updateData.emergencyContact.name && 
+        !updateData.emergencyContact.relationship && 
+        !updateData.emergencyContact.phone) {
+      updateData.emergencyContact = undefined;
+    }
+
+    // Remove _id from update data if present
+    delete updateData._id;
+
+    const patient = await Patient.findByIdAndUpdate(
+      req.params.id, 
+      updateData, 
+      { new: true, runValidators: true }
+    );
+    
     if (!patient) return res.status(404).send('Patient not found');
+    
     res.redirect(`/patients/${patient._id}`);
+  } catch (err) {
+    console.error('Update error:', err);
+    
+    if (err.name === 'ValidationError') {
+      const errors = Object.values(err.errors).map(e => ({ msg: e.message }));
+      const doctors = await User.find({ role: 'doctor' }).select('username fullName');
+      return res.status(400).render('patients/form', {
+        patient: req.body,
+        doctors: doctors,
+        errors: errors,
+        action: `/patients/${req.params.id}?_method=PUT`
+      });
+    }
+    
+    if (err.code === 11000) {
+      const doctors = await User.find({ role: 'doctor' }).select('username fullName');
+      return res.status(400).render('patients/form', {
+        patient: req.body,
+        doctors: doctors,
+        errors: [{ msg: 'A patient with this name already exists. Please use a different name.' }],
+        action: `/patients/${req.params.id}?_method=PUT`
+      });
+    }
+    
+    res.status(500).send('Server Error');
+  }
+};
+
+exports.editForm = async (req, res) => {
+  try {
+    const patient = await Patient.findById(req.params.id).populate('assignedDoctor');
+    if (!patient) return res.status(404).send('Patient not found');
+    const doctors = await User.find({ role: 'doctor' }).select('username fullName');
+    res.render('patients/form', { 
+      patient, 
+      doctors,
+      action: `/patients/${patient._id}?_method=PUT`
+    });
   } catch (err) {
     console.error(err);
     res.status(500).send('Server Error');

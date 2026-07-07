@@ -20,13 +20,13 @@ exports.newForm = (req, res) => {
 // Create a new user
 exports.create = async (req, res) => {
   try {
-    const { username, password, role } = req.body;
+    const { username, password, role, fullName } = req.body;
     const existing = await User.findOne({ username });
     if (existing) {
       return res.render('users/form', { user: null, error: 'Username already exists' });
     }
     const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = new User({ username, password: hashedPassword, role });
+    const newUser = new User({ username, password: hashedPassword, role, fullName });
     await newUser.save();
     res.redirect('/users');
   } catch (err) {
@@ -50,8 +50,8 @@ exports.editForm = async (req, res) => {
 // Update user (username, role, password optional)
 exports.update = async (req, res) => {
   try {
-    const { username, role, password } = req.body;
-    const updateData = { username, role };
+    const { username, role, password, fullName } = req.body;
+    const updateData = { username, role, fullName };
     if (password && password.trim() !== '') {
       updateData.password = await bcrypt.hash(password, 10);
     }

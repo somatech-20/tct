@@ -1,4 +1,4 @@
-<!-- Export -->
+<!-- Export
 <div class="flex justify-between items-center mb-4">
     <h2>
         <%= t('patients') %>
@@ -90,6 +90,141 @@
                                         </svg>
                                         Export
                                     </a>
+                        </td>
+                    </tr>
+                    <% }); %>
+            </tbody>
+        </table>
+    </div>
+</div> -->
+
+<div class="bg-white rounded-lg shadow overflow-hidden">
+    <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+        <h2 class="text-xl font-semibold">
+            <%= t('patients') %>
+        </h2>
+        <div class="flex space-x-2">
+            <% if (user && (user.role==='doctor' || user.role==='receptionist' )) { %>
+                <a href="/patients/new"
+                    class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded text-sm flex items-center">
+                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    </svg>
+                    <%= t('add_patient') %>
+                </a>
+                <% } %>
+                    <a href="/patients/export/csv"
+                        class="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded text-sm">CSV</a>
+                    <a href="/patients/export/excel"
+                        class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded text-sm">Excel</a>
+                    <a href="/patients/export/pdf"
+                        class="bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded text-sm">PDF</a>
+        </div>
+    </div>
+    <!-- Add this above the patient table in views/patients/list.ejs -->
+    <div class="bg-white rounded-lg shadow p-4 mb-6">
+        <form method="GET" action="/patients" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div>
+                <label class="block text-gray-700 text-sm font-bold mb-2">Search</label>
+                <input type="text" name="search" value="<%= query?.search || '' %>" placeholder="Name, phone, email..."
+                    class="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            </div>
+            <div>
+                <label class="block text-gray-700 text-sm font-bold mb-2">Status</label>
+                <select name="status"
+                    class="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    <option value="">All</option>
+                    <option value="Active" <%=query?.status==='Active' ? 'selected' : '' %>>Active</option>
+                    <option value="Recovered" <%=query?.status==='Recovered' ? 'selected' : '' %>>Recovered</option>
+                    <option value="Defaulted" <%=query?.status==='Defaulted' ? 'selected' : '' %>>Defaulted</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-gray-700 text-sm font-bold mb-2">District</label>
+                <select name="district"
+                    class="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    <option value="">All</option>
+                    <option value="Hodan" <%=query?.district==='Hodan' ? 'selected' : '' %>>Hodan</option>
+                    <option value="Abdiaziz" <%=query?.district==='Abdiaziz' ? 'selected' : '' %>>Abdiaziz</option>
+                    <!-- Add all districts -->
+                </select>
+            </div>
+            <div>
+                <label class="block text-gray-700 text-sm font-bold mb-2">Returnee</label>
+                <select name="returnee"
+                    class="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    <option value="">All</option>
+                    <option value="true" <%=query?.returnee==='true' ? 'selected' : '' %>>Yes</option>
+                    <option value="false" <%=query?.returnee==='false' ? 'selected' : '' %>>No</option>
+                </select>
+            </div>
+            <div class="md:col-span-4 flex justify-end space-x-2">
+                <button type="submit"
+                    class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded">Filter</button>
+                <a href="/patients" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded">Clear</a>
+            </div>
+        </form>
+    </div>
+
+    <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">District
+                    </th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Doctor
+                    </th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status
+                    </th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Returnee
+                    </th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Registered By</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions
+                    </th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+                <% patients.forEach(patient=> { %>
+                    <tr>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <a href="/patients/<%= patient._id %>" class="text-indigo-600 hover:text-indigo-900">
+                                <%= patient.fullName %>
+                            </a>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <%= patient.district || 'N/A' %>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <%= patient.assignedDoctor ? (patient.assignedDoctor.fullName ||
+                                patient.assignedDoctor.username) : 'Unassigned' %>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                        <% if (patient.status === 'Active') { %>bg-green-100 text-green-800<% } 
+                        else if (patient.status === 'Recovered') { %>bg-blue-100 text-blue-800<% } 
+                        else { %>bg-red-100 text-red-800<% } %>">
+                                <%= patient.status %>
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <%= patient.isReturnee ? '✅ Yes' : '❌ No' %>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <%= patient.registeredBy ? (patient.registeredBy.fullName || patient.registeredBy.username)
+                                : 'N/A' %>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <a href="/patients/<%= patient._id %>"
+                                class="text-indigo-600 hover:text-indigo-900">View</a>
+                            <% if (user && (user.role==='receptionist' || user.role==='admin' )) { %>
+                                | <a href="/patients/<%= patient._id %>/edit"
+                                    class="text-yellow-600 hover:text-yellow-900">Edit</a>
+                                <% } %>
+                                    | <a href="/patients/<%= patient._id %>/export"
+                                        class="text-green-600 hover:text-green-900">Export</a>
                         </td>
                     </tr>
                     <% }); %>

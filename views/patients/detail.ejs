@@ -1,4 +1,4 @@
-<div class="bg-white shadow rounded-lg p-6 mb-6">
+<!-- <div class="bg-white shadow rounded-lg p-6 mb-6">
     <h2 class="text-xl font-bold mb-4"><%= patient.fullName %></h2>
     <div class="grid grid-cols-2 gap-4">
         <div><span class="font-semibold"><%= t('age') %>:</span> <%= patient.age %></div>
@@ -59,4 +59,120 @@
             </tbody>
         </table>
     </div>
+</div> -->
+
+<div class="bg-white shadow rounded-lg p-6 mb-6">
+    <div class="flex justify-between items-start">
+        <h2 class="text-2xl font-bold mb-4"><%= patient.fullName %></h2>
+        <div class="flex space-x-2">
+            <% if (user && (user.role === 'receptionist' || user.role === 'admin')) { %>
+            <a href="/patients/<%= patient._id %>/edit" class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded text-sm">Edit</a>
+            <% } %>
+            <a href="/patients/<%= patient._id %>/export" class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-sm">Export</a>
+        </div>
+    </div>
+    
+    <div class="grid grid-cols-2 gap-4">
+        <!-- Basic Info -->
+        <div><span class="font-semibold">Email:</span> <%= patient.email || 'N/A' %></div>
+        <div><span class="font-semibold">Phone:</span> <%= patient.phone || 'N/A' %></div>
+        <div><span class="font-semibold">Age:</span> <%= patient.age %></div>
+        <div><span class="font-semibold">Gender:</span> <%= patient.gender %></div>
+        <div><span class="font-semibold">Marital Status:</span> <%= patient.maritalStatus || 'N/A' %></div>
+        <div><span class="font-semibold">District:</span> <%= patient.district || 'N/A' %></div>
+        <div><span class="font-semibold">TB Type:</span> <%= patient.tbType %></div>
+        <div><span class="font-semibold">Treatment Start:</span> <%= patient.treatmentStartDate.toDateString() %></div>
+        <div><span class="font-semibold">Status:</span> 
+            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+            <% if (patient.status === 'Active') { %>bg-green-100 text-green-800<% } 
+            else if (patient.status === 'Recovered') { %>bg-blue-100 text-blue-800<% } 
+            else { %>bg-red-100 text-red-800<% } %>">
+                <%= patient.status %>
+            </span>
+        </div>
+        <div><span class="font-semibold">Returnee:</span> <%= patient.isReturnee ? '✅ Yes' : '❌ No' %></div>
+        <% if (patient.isReturnee && patient.previousTreatmentDate) { %>
+        <div><span class="font-semibold">Previous Treatment Date:</span> <%= patient.previousTreatmentDate.toDateString() %></div>
+        <% } %>
+        <div><span class="font-semibold">Assigned Doctor:</span> 
+            <%= patient.assignedDoctor ? (patient.assignedDoctor.fullName || patient.assignedDoctor.username) : 'Unassigned' %>
+        </div>
+        <div><span class="font-semibold">Registered By:</span> 
+            <%= patient.registeredBy ? (patient.registeredBy.fullName || patient.registeredBy.username) : 'N/A' %>
+        </div>
+        <div><span class="font-semibold">Created At:</span> <%= new Date(patient.createdAt).toLocaleString() %></div>
+    </div>
+
+    <!-- Emergency Contact Section -->
+    <div class="mt-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
+        <h3 class="text-md font-bold mb-3">Emergency Contact</h3>
+        <div class="grid grid-cols-3 gap-4">
+            <div><span class="font-semibold">Name:</span> <%= patient.emergencyContact?.name || 'N/A' %></div>
+            <div><span class="font-semibold">Relationship:</span> <%= patient.emergencyContact?.relationship || 'N/A' %></div>
+            <div><span class="font-semibold">Phone:</span> <%= patient.emergencyContact?.phone || 'N/A' %></div>
+        </div>
+    </div>
 </div>
+
+<!-- Treatment Logs -->
+<div class="bg-white shadow rounded-lg p-6 mb-6">
+    <div class="flex justify-between items-center mb-4">
+        <h3 class="text-lg font-semibold">Treatment Logs (DOTS)</h3>
+        <% if (user && user.role === 'doctor') { %>
+        <a href="/patients/<%= patient._id %>/treatments/new" class="bg-indigo-600 text-white px-3 py-1 rounded text-sm">Add Log</a>
+        <% } %>
+    </div>
+    <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead>
+                <tr>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Dose Taken</th>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Sputum Result</th>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Notes</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% treatments.forEach(log => { %>
+                <tr>
+                    <td class="px-4 py-2"><%= log.date.toDateString() %></td>
+                    <td class="px-4 py-2"><%= log.doseTaken ? '✅ Yes' : '❌ No' %></td>
+                    <td class="px-4 py-2"><%= log.sputumResult %></td>
+                    <td class="px-4 py-2"><%= log.notes || '' %></td>
+                </tr>
+                <% }); %>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Contacts (replacing with emergency contact, but keeping for backward compatibility) -->
+<% if (contacts && contacts.length > 0) { %>
+<div class="bg-white shadow rounded-lg p-6">
+    <div class="flex justify-between items-center mb-4">
+        <h3 class="text-lg font-semibold">Contacts</h3>
+    </div>
+    <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead>
+                <tr>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Relationship</th>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Screening Date</th>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% contacts.forEach(contact => { %>
+                <tr>
+                    <td class="px-4 py-2"><%= contact.fullName %></td>
+                    <td class="px-4 py-2"><%= contact.relationship %></td>
+                    <td class="px-4 py-2"><%= contact.screeningDate.toDateString() %></td>
+                    <td class="px-4 py-2"><%= contact.screeningStatus %></td>
+                </tr>
+                <% }); %>
+            </tbody>
+        </table>
+    </div>
+</div>
+<% } %>
