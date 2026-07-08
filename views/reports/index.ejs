@@ -1,0 +1,351 @@
+<div class="max-w-full px-4 md:px-6">
+    <!-- Stats Cards with Gradients -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-6 md:mb-8">
+        <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg shadow-lg p-4 md:p-6 text-white">
+            <p class="text-sm opacity-80">Total Patients</p>
+            <p class="text-2xl md:text-3xl font-bold">
+                <%= stats.total %>
+            </p>
+        </div>
+        <div class="bg-gradient-to-br from-green-500 to-green-600 rounded-lg shadow-lg p-4 md:p-6 text-white">
+            <p class="text-sm opacity-80">Active</p>
+            <p class="text-2xl md:text-3xl font-bold">
+                <%= stats.active %>
+            </p>
+        </div>
+        <div class="bg-gradient-to-br from-blue-400 to-blue-500 rounded-lg shadow-lg p-4 md:p-6 text-white">
+            <p class="text-sm opacity-80">Recovered</p>
+            <p class="text-2xl md:text-3xl font-bold">
+                <%= stats.recovered %>
+            </p>
+        </div>
+        <div class="bg-gradient-to-br from-red-500 to-red-600 rounded-lg shadow-lg p-4 md:p-6 text-white">
+            <p class="text-sm opacity-80">Defaulted</p>
+            <p class="text-2xl md:text-3xl font-bold">
+                <%= stats.defaulted %>
+            </p>
+        </div>
+    </div>
+
+    <!-- Filters Section -->
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4 md:p-6 mb-6">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3">
+            <h3 class="text-lg font-semibold text-gray-800 dark:text-white">🔍 Filters & Export</h3>
+            <div class="flex flex-wrap gap-2 w-full sm:w-auto">
+                <button id="exportBtn"
+                    class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg flex items-center justify-center w-full sm:w-auto transition duration-200">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                    </svg>
+                    Export Report
+                </button>
+            </div>
+        </div>
+
+        <!-- Filters & Export -->
+        <div
+            class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-5 mb-6">
+            <!-- Top Row -->
+            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-4">
+                <!-- Search -->
+                <div class="w-full lg:max-w-md">
+                    <div class="relative">
+                        <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none"
+                            stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                        <input type="text" form="filterForm" name="search" value="<%= filters.search || '' %>"
+                            placeholder="Search patient, phone, ID..."
+                            class="w-full pl-10 pr-4 py-2.5 text-sm bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:text-white transition">
+                    </div>
+                </div>
+                <!-- Export
+                <button id="exportBtn" type="button"
+                    class="inline-flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl text-sm font-medium transition shadow-sm">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                    </svg>
+                    Export Report
+                </button> -->
+            </div>
+            <!-- Filters -->
+            <form id="filterForm" method="GET" action="/reports" class="flex flex-wrap items-center gap-3">
+                <!-- Status -->
+                <select name="status"
+                    class="min-w-[150px] px-3 py-2.5 text-sm bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:text-white">
+                    <option value="">All Status</option>
+                    <option value="Active" <%=filters.status==='Active' ? 'selected' : '' %>>
+                        Active
+                    </option>
+                    <option value="Recovered" <%=filters.status==='Recovered' ? 'selected' : '' %>>
+                        Recovered
+                    </option>
+                    <option value="Defaulted" <%=filters.status==='Defaulted' ? 'selected' : '' %>>
+                        Defaulted
+                    </option>
+                </select>
+
+                <!-- District -->
+                <select name="district"
+                    class="min-w-[170px] px-3 py-2.5 text-sm bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:text-white">
+                    <option value="">All Districts</option>
+                    <% districts.forEach(d=> { %>
+                        <option value="<%= d %>" <%=filters.district===d ? 'selected' : '' %>>
+                            <%= d %>
+                        </option>
+                        <% }) %>
+                </select>
+
+                <!-- Doctor -->
+                <select name="doctor"
+                    class="min-w-[170px] px-3 py-2.5 text-sm bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:text-white">
+
+                    <option value="">All Doctors</option>
+
+                    <% doctors.forEach(d=> { %>
+
+                        <option value="<%= d._id %>" <%=filters.doctor===d._id.toString() ? 'selected' : '' %>>
+
+                            <%= d.fullName || d.username %>
+                        </option>
+                        <% }) %>
+                </select>
+                <!-- Returnee -->
+                <select name="returnee"
+                    class="min-w-[150px] px-3 py-2.5 text-sm bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:text-white">
+                    <option value="">All Patients</option>
+                    <option value="true" <%=filters.returnee==='true' ? 'selected' : '' %>>
+                        Returnee
+                    </option>
+                    <option value="false" <%=filters.returnee==='false' ? 'selected' : '' %>>
+                        Non-Returnee
+                    </option>
+                </select>
+                <!-- Spacer -->
+                <div class="flex-1"></div>
+                <!-- Reset -->
+                <a href="/reports"
+                    class="px-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 transition text-sm font-medium">
+                    Reset
+                </a>
+                <!-- Apply -->
+                <button type="submit"
+                    class="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium transition shadow-sm">
+                    Apply Filters
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Patient Table -->
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
+        <div
+            class="px-4 md:px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center flex-wrap gap-2">
+            <h3 class="text-lg font-semibold text-gray-800 dark:text-white">Patients (<%= patients.length %>)</h3>
+            <span class="text-sm text-gray-500 dark:text-gray-400">
+                Showing <%= patients.length %> of <%= patients.length %> total
+            </span>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                <thead class="bg-gray-50 dark:bg-gray-700">
+                    <tr>
+                        <th
+                            class="px-3 md:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">
+                            Patient ID</th>
+                        <th
+                            class="px-3 md:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">
+                            Name</th>
+                        <th
+                            class="px-3 md:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase hidden sm:table-cell">
+                            District</th>
+                        <th
+                            class="px-3 md:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase hidden lg:table-cell">
+                            Doctor</th>
+                        <th
+                            class="px-3 md:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">
+                            Status</th>
+                        <th
+                            class="px-3 md:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase hidden md:table-cell">
+                            Returnee</th>
+                        <th
+                            class="px-3 md:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">
+                            Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                    <% patients.forEach(patient=> { %>
+                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition duration-150">
+                            <td class="px-3 md:px-6 py-4 text-xs md:text-sm font-mono text-gray-600 dark:text-gray-300">
+                                <%= patient.patientId || 'N/A' %>
+                            </td>
+                            <td class="px-3 md:px-6 py-4">
+                                <a href="/patients/<%= patient._id %>"
+                                    class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300 text-sm md:text-base">
+                                    <%= patient.fullName %>
+                                </a>
+                            </td>
+                            <td class="px-3 md:px-6 py-4 text-sm hidden sm:table-cell">
+                                <%= patient.district || 'N/A' %>
+                            </td>
+                            <td class="px-3 md:px-6 py-4 text-sm hidden lg:table-cell">
+                                <%= patient.assignedDoctor ? (patient.assignedDoctor.fullName ||
+                                    patient.assignedDoctor.username) : 'Unassigned' %>
+                            </td>
+                            <td class="px-3 md:px-6 py-4">
+                                <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full 
+                            <% if (patient.status === 'Active') { %>bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200<% } 
+                            else if (patient.status === 'Recovered') { %>bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200<% } 
+                            else { %>bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200<% } %>">
+                                    <%= patient.status %>
+                                </span>
+                            </td>
+                            <td class="px-3 md:px-6 py-4 text-sm hidden md:table-cell">
+                                <%= patient.isReturnee ? '✅ Yes' : '❌ No' %>
+                            </td>
+                            <td class="px-3 md:px-6 py-4">
+                                <a href="/patients/<%= patient._id %>"
+                                    class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300 text-sm">View</a>
+                            </td>
+                        </tr>
+                        <% }); %>
+                            <% if (patients.length===0) { %>
+                                <tr>
+                                    <td colspan="7" class="px-6 py-8 text-center text-gray-500 dark:text-gray-400">
+                                        <svg class="w-12 h-12 mx-auto text-gray-400 dark:text-gray-600 mb-3" fill="none"
+                                            stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2" />
+                                        </svg>
+                                        <p>No patients found matching your filters.</p>
+                                    </td>
+                                </tr>
+                                <% } %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Export Modal -->
+<div id="exportModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 hidden">
+    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white dark:bg-gray-800">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-bold">Export Report</h3>
+            <button id="closeExportModal" class="text-gray-400 hover:text-gray-600">&times;</button>
+        </div>
+
+        <form id="exportForm" method="POST" action="/reports/export" target="_blank" class="no-loader">
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2">Select Format</label>
+                <div class="grid grid-cols-3 gap-2">
+                    <button type="button" data-format="pdf"
+                        class="format-btn px-4 py-2 border rounded hover:bg-indigo-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <svg class="w-6 h-6 mx-auto text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                        </svg>
+                        <span class="text-sm mt-1">PDF</span>
+                    </button>
+                    <button type="button" data-format="excel"
+                        class="format-btn px-4 py-2 border rounded hover:bg-indigo-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <svg class="w-6 h-6 mx-auto text-green-500" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2" />
+                        </svg>
+                        <span class="text-sm mt-1">Excel</span>
+                    </button>
+                    <button type="button" data-format="csv"
+                        class="format-btn px-4 py-2 border rounded hover:bg-indigo-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <svg class="w-6 h-6 mx-auto text-blue-500" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+                        </svg>
+                        <span class="text-sm mt-1">CSV</span>
+                    </button>
+                </div>
+                <input type="hidden" name="format" id="selectedFormat" value="pdf">
+            </div>
+
+            <!-- Hidden fields to pass current filters -->
+            <input type="hidden" name="startDate" value="<%= filters.startDate || '' %>">
+            <input type="hidden" name="endDate" value="<%= filters.endDate || '' %>">
+            <input type="hidden" name="doctor" value="<%= filters.doctor || '' %>">
+            <input type="hidden" name="status" value="<%= filters.status || '' %>">
+            <input type="hidden" name="district" value="<%= filters.district || '' %>">
+            <input type="hidden" name="returnee" value="<%= filters.returnee || '' %>">
+            <input type="hidden" name="search" value="<%= filters.search || '' %>">
+            <!-- <input type="hidden" name="returnee" value="<%= filters.returnee || '' %>"> -->
+
+            <div class="mt-4 flex justify-end space-x-2">
+                <button type="button" id="cancelExport"
+                    class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded">Cancel</button>
+                <button type="submit" id="confirmExport"
+                    class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded" disabled>Export</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script nonce="<%= nonce %>">
+    document.addEventListener('DOMContentLoaded', function () {
+        // ===== EXPORT MODAL =====
+        const exportBtn = document.getElementById('exportBtn');
+        const modal = document.getElementById('exportModal');
+        const closeModal = document.getElementById('closeExportModal');
+        const cancelExport = document.getElementById('cancelExport');
+        const confirmBtn = document.getElementById('confirmExport');
+        const formatInput = document.getElementById('selectedFormat');
+
+        // Open modal
+        exportBtn.addEventListener('click', function () {
+            modal.classList.remove('hidden');
+            // Reset selection
+            document.querySelectorAll('.format-btn').forEach(btn => {
+                btn.classList.remove('bg-indigo-100', 'border-indigo-500');
+            });
+            confirmBtn.disabled = true;
+        });
+
+        // Close modal
+        function closeModalFn() {
+            modal.classList.add('hidden');
+        }
+        closeModal.addEventListener('click', closeModalFn);
+        cancelExport.addEventListener('click', closeModalFn);
+        window.addEventListener('click', function (e) {
+            if (e.target === modal) closeModalFn();
+        });
+
+        // Format selection
+        document.querySelectorAll('.format-btn').forEach(btn => {
+            btn.addEventListener('click', function () {
+                document.querySelectorAll('.format-btn').forEach(b => {
+                    b.classList.remove('bg-indigo-100', 'border-indigo-500');
+                });
+                this.classList.add('bg-indigo-100', 'border-indigo-500');
+                formatInput.value = this.dataset.format;
+                confirmBtn.disabled = false;
+            });
+        });
+
+        // Submit export form
+        document.getElementById('exportForm').addEventListener('submit', function (e) {
+            // Show loading state
+            confirmBtn.disabled = true;
+            confirmBtn.textContent = 'Exporting...';
+
+            // The form will submit normally and open in new tab
+            setTimeout(() => {
+                closeModalFn();
+                confirmBtn.disabled = false;
+                confirmBtn.textContent = 'Export';
+            }, 2000);
+        });
+    });
+</script>

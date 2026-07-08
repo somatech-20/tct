@@ -1,0 +1,65 @@
+<div class="max-w-4xl mx-auto">
+    <div class="bg-white rounded-lg shadow p-6">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-xl font-bold">Notifications</h2>
+            <div class="flex space-x-3">
+                <span class="text-sm text-gray-500"><%= unreadCount %> unread</span>
+                <% if (unreadCount > 0) { %>
+                    <button id="markAllReadBtn" class="text-sm text-indigo-600 hover:text-indigo-800">Mark all read</button>
+                <% } %>
+            </div>
+        </div>
+
+        <% if (notifications && notifications.length > 0) { %>
+            <div class="divide-y divide-gray-200">
+                <% notifications.forEach(notification => { %>
+                    <div class="py-4 <%= notification.read ? '' : 'bg-blue-50 -mx-6 px-6' %>">
+                        <div class="flex items-start justify-between">
+                            <div class="flex-1">
+                                <div class="flex items-center">
+                                    <p class="text-sm font-medium <%= notification.read ? 'text-gray-600' : 'text-gray-900' %>">
+                                        <%= notification.title %>
+                                    </p>
+                                    <% if (!notification.read) { %>
+                                        <span class="ml-2 px-2 py-0.5 text-xs bg-blue-500 text-white rounded-full">New</span>
+                                    <% } %>
+                                </div>
+                                <p class="text-sm text-gray-600 mt-1"><%= notification.message %></p>
+                                <p class="text-xs text-gray-400 mt-1">
+                                    <%= new Date(notification.createdAt).toLocaleString() %>
+                                    <% if (notification.read && notification.readAt) { %>
+                                        • Read at <%= new Date(notification.readAt).toLocaleString() %>
+                                    <% } %>
+                                </p>
+                            </div>
+                            <% if (!notification.read) { %>
+                                <button onclick="markRead('<%= notification._id %>')" class="text-xs text-indigo-600 hover:text-indigo-800">Mark read</button>
+                            <% } %>
+                        </div>
+                    </div>
+                <% }); %>
+            </div>
+        <% } else { %>
+            <p class="text-center text-gray-500 py-8">No notifications</p>
+        <% } %>
+    </div>
+</div>
+
+<script nonce="<%= nonce %>">
+    function markRead(id) {
+        fetch(`/notifications/api/${id}/read`, { method: 'PUT' })
+            .then(() => window.location.reload())
+            .catch(err => console.error('Error marking read:', err));
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const markAllBtn = document.getElementById('markAllReadBtn');
+        if (markAllBtn) {
+            markAllBtn.addEventListener('click', function() {
+                fetch('/notifications/api/mark-all-read', { method: 'PUT' })
+                    .then(() => window.location.reload())
+                    .catch(err => console.error('Error marking all read:', err));
+            });
+        }
+    });
+</script>

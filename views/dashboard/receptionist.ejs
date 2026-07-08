@@ -1,0 +1,113 @@
+<!-- Stats Cards -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+    <div class="bg-white rounded-lg shadow p-6">
+        <h3 class="text-gray-500 text-sm">Total Registered</h3>
+        <p class="text-3xl font-bold"><%= totalRegistered %></p>
+    </div>
+    <div class="bg-white rounded-lg shadow p-6">
+        <h3 class="text-gray-500 text-sm">Active Cases</h3>
+        <p class="text-3xl font-bold text-green-600"><%= activeRegistered %></p>
+    </div>
+    <div class="bg-white rounded-lg shadow p-6">
+        <h3 class="text-gray-500 text-sm">Today's Registrations</h3>
+        <p class="text-3xl font-bold text-blue-600"><%= todayRegistrations %></p>
+    </div>
+    <div class="bg-white rounded-lg shadow p-6">
+        <h3 class="text-gray-500 text-sm">Incomplete Records</h3>
+        <p class="text-3xl font-bold text-yellow-600"><%= incompleteCount %></p>
+    </div>
+</div>
+
+<!-- Incomplete Records Alert -->
+<% if (incompleteCount > 0) { %>
+<div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
+    <div class="flex items-start">
+        <div class="flex-shrink-0">
+            <svg class="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+            </svg>
+        </div>
+        <div class="ml-3">
+            <p class="text-sm text-yellow-700">
+                <strong><%= incompleteCount %></strong> patient(s) have incomplete records.
+                Please review and complete them.
+            </p>
+            <div class="mt-2">
+                <% incompletePatients.forEach(patient => { %>
+                    <a href="/patients/<%= patient._id %>/edit" class="text-sm text-yellow-700 underline hover:text-yellow-900 mr-3">
+                        <%= patient.fullName %> (<%= patient.patientId || 'N/A' %>)
+                    </a>
+                <% }); %>
+            </div>
+        </div>
+    </div>
+</div>
+<% } %>
+
+<!-- Recent Registrations -->
+<div class="bg-white rounded-lg shadow p-6">
+    <div class="flex justify-between items-center mb-4">
+        <h3 class="text-lg font-semibold">📋 Recent Registrations (Last 7 Days)</h3>
+        <a href="/patients" class="text-indigo-600 hover:text-indigo-800 text-sm">View All →</a>
+    </div>
+    <% if (recentRegistrations.length > 0) { %>
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Patient ID</th>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Assigned Doctor</th>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                    <% recentRegistrations.forEach(patient => { %>
+                    <tr>
+                        <td class="px-4 py-2 text-sm font-mono"><%= patient.patientId || 'N/A' %></td>
+                        <td class="px-4 py-2"><%= patient.fullName %></td>
+                        <td class="px-4 py-2"><%= patient.assignedDoctor ? patient.assignedDoctor.fullName || patient.assignedDoctor.username : 'Unassigned' %></td>
+                        <td class="px-4 py-2">
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                            <% if (patient.status === 'Active') { %>bg-green-100 text-green-800<% } 
+                            else if (patient.status === 'Recovered') { %>bg-blue-100 text-blue-800<% } 
+                            else { %>bg-red-100 text-red-800<% } %>">
+                                <%= patient.status %>
+                            </span>
+                        </td>
+                        <td class="px-4 py-2">
+                            <a href="/patients/<%= patient._id %>" class="text-indigo-600 hover:text-indigo-900 text-sm">View</a>
+                            | <a href="/patients/<%= patient._id %>/edit" class="text-yellow-600 hover:text-yellow-900 text-sm">Edit</a>
+                        </td>
+                    </tr>
+                    <% }); %>
+                </tbody>
+            </table>
+        </div>
+    <% } else { %>
+        <p class="text-gray-500 text-center py-4">No recent registrations</p>
+    <% } %>
+</div>
+
+<!-- Quick Actions -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+    <a href="/patients/new" class="bg-indigo-600 hover:bg-indigo-700 text-white p-4 rounded-lg shadow text-center transition">
+        <svg class="w-8 h-8 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+        </svg>
+        <span class="font-semibold">Register New Patient</span>
+    </a>
+    <a href="/patients" class="bg-green-600 hover:bg-green-700 text-white p-4 rounded-lg shadow text-center transition">
+        <svg class="w-8 h-8 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+        </svg>
+        <span class="font-semibold">View All Patients</span>
+    </a>
+    <a href="/patients/export/pdf" class="bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-lg shadow text-center transition">
+        <svg class="w-8 h-8 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+        </svg>
+        <span class="font-semibold">Export Reports</span>
+    </a>
+</div>

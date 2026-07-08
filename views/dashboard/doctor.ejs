@@ -1,0 +1,104 @@
+<!-- Stats Cards -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+    <div class="bg-white rounded-lg shadow p-6">
+        <h3 class="text-gray-500 text-sm">Total Assigned</h3>
+        <p class="text-3xl font-bold"><%= totalAssigned %></p>
+    </div>
+    <div class="bg-white rounded-lg shadow p-6">
+        <h3 class="text-gray-500 text-sm">Active Cases</h3>
+        <p class="text-3xl font-bold text-green-600"><%= activeAssigned %></p>
+    </div>
+    <div class="bg-white rounded-lg shadow p-6">
+        <h3 class="text-gray-500 text-sm">Recovered</h3>
+        <p class="text-3xl font-bold text-blue-600"><%= recoveredAssigned %></p>
+    </div>
+    <div class="bg-white rounded-lg shadow p-6">
+        <h3 class="text-gray-500 text-sm">Defaulters</h3>
+        <p class="text-3xl font-bold text-red-600"><%= defaultedAssigned %></p>
+    </div>
+</div>
+
+<!-- Today's Patients -->
+<div class="bg-white rounded-lg shadow p-6 mb-6">
+    <div class="flex justify-between items-center mb-4">
+        <h3 class="text-lg font-semibold">📋 Today's Patients</h3>
+        <span class="text-sm text-gray-500"><%= todayPatients.length %> patients today</span>
+    </div>
+    <% if (todayPatients.length > 0) { %>
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Patient ID</th>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Phone</th>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">TB Type</th>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                    <% todayPatients.forEach(patient => { %>
+                    <tr>
+                        <td class="px-4 py-2 text-sm font-mono"><%= patient.patientId || 'N/A' %></td>
+                        <td class="px-4 py-2"><a href="/patients/<%= patient._id %>" class="text-indigo-600 hover:text-indigo-900"><%= patient.fullName %></a></td>
+                        <td class="px-4 py-2"><%= patient.phone || 'N/A' %></td>
+                        <td class="px-4 py-2"><%= patient.tbType %></td>
+                        <td class="px-4 py-2">
+                            <a href="/patients/<%= patient._id %>/treatments/new" class="text-green-600 hover:text-green-900 text-sm">Log DOTS</a>
+                            | <a href="/patients/<%= patient._id %>" class="text-indigo-600 hover:text-indigo-900 text-sm">View</a>
+                        </td>
+                    </tr>
+                    <% }); %>
+                </tbody>
+            </table>
+        </div>
+    <% } else { %>
+        <p class="text-gray-500 text-center py-4">No patients scheduled for today. 🎉</p>
+    <% } %>
+</div>
+
+<!-- Missed Dose Alerts -->
+<% if (missedDosePatients && missedDosePatients.length > 0) { %>
+<div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+    <h4 class="text-red-700 font-semibold mb-2">⚠️ Missed Dose Alerts</h4>
+    <ul class="list-disc list-inside">
+        <% missedDosePatients.forEach(patient => { %>
+            <li class="text-red-600">
+                <a href="/patients/<%= patient._id %>" class="hover:underline">
+                    <%= patient.fullName %> (<%= patient.patientId %>)
+                </a>
+                – Missed dose for <%= patient.missedDays %> day(s)
+            </li>
+        <% }); %>
+    </ul>
+</div>
+<% } %>
+
+<!-- Recent Notifications -->
+<div class="bg-white rounded-lg shadow p-6">
+    <div class="flex justify-between items-center mb-4">
+        <h3 class="text-lg font-semibold">🔔 Recent Notifications</h3>
+        <span class="text-sm text-gray-500"><%= unreadNotifications %> unread</span>
+    </div>
+    <% if (recentNotifications && recentNotifications.length > 0) { %>
+        <div class="space-y-2">
+            <% recentNotifications.forEach(notification => { %>
+                <div class="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 <%= notification.read ? 'bg-gray-50' : 'bg-blue-50 border-blue-200' %>">
+                    <div>
+                        <p class="font-medium"><%= notification.title %></p>
+                        <p class="text-sm text-gray-600"><%= notification.message %></p>
+                        <p class="text-xs text-gray-400"><%= new Date(notification.createdAt).toLocaleString() %></p>
+                    </div>
+                    <% if (!notification.read) { %>
+                        <span class="px-2 py-1 text-xs bg-blue-500 text-white rounded-full">New</span>
+                    <% } %>
+                </div>
+            <% }); %>
+        </div>
+    <% } else { %>
+        <p class="text-gray-500 text-center py-4">No notifications</p>
+    <% } %>
+    <div class="mt-4 text-center">
+        <a href="/notifications" class="text-indigo-600 hover:text-indigo-800 text-sm">View All Notifications →</a>
+    </div>
+</div>

@@ -1,0 +1,95 @@
+<div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+    <div class="bg-white rounded-lg shadow p-6">
+        <h3 class="text-gray-500 text-sm">Total Patients</h3>
+        <p class="text-3xl font-bold"><%= totalPatients %></p>
+    </div>
+    <div class="bg-white rounded-lg shadow p-6">
+        <h3 class="text-gray-500 text-sm">Active Cases</h3>
+        <p class="text-3xl font-bold text-green-600"><%= totalActive %></p>
+    </div>
+    <div class="bg-white rounded-lg shadow p-6">
+        <h3 class="text-gray-500 text-sm">Recovered</h3>
+        <p class="text-3xl font-bold text-blue-600"><%= totalRecovered %></p>
+    </div>
+    <div class="bg-white rounded-lg shadow p-6">
+        <h3 class="text-gray-500 text-sm">Defaulters</h3>
+        <p class="text-3xl font-bold text-red-600"><%= totalDefaulters %></p>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+    <div class="bg-white rounded-lg shadow p-6">
+        <h3 class="text-lg font-semibold mb-4">👥 Users</h3>
+        <div class="grid grid-cols-3 gap-4 text-center">
+            <div>
+                <p class="text-2xl font-bold"><%= totalDoctors %></p>
+                <p class="text-gray-500 text-sm">Doctors</p>
+            </div>
+            <div>
+                <p class="text-2xl font-bold"><%= totalReceptionists %></p>
+                <p class="text-gray-500 text-sm">Receptionists</p>
+            </div>
+            <div>
+                <p class="text-2xl font-bold"><%= totalDoctors + totalReceptionists + 1 %></p>
+                <p class="text-gray-500 text-sm">Total Users</p>
+            </div>
+        </div>
+        <div class="mt-4">
+            <a href="/users" class="text-indigo-600 hover:text-indigo-800 text-sm">Manage Users →</a>
+        </div>
+    </div>
+    
+    <div class="bg-white rounded-lg shadow p-6">
+        <h3 class="text-lg font-semibold mb-4">🔔 Notifications</h3>
+        <p class="text-2xl font-bold"><%= unreadNotifications %></p>
+        <p class="text-gray-500 text-sm">Unread notifications</p>
+        <div class="mt-4">
+            <a href="/notifications" class="text-indigo-600 hover:text-indigo-800 text-sm">View All →</a>
+        </div>
+    </div>
+</div>
+
+<div class="bg-white rounded-lg shadow p-6">
+    <div class="flex justify-between items-center mb-4">
+        <h3 class="text-lg font-semibold">📋 Recent Patients</h3>
+        <a href="/patients" class="text-indigo-600 hover:text-indigo-800 text-sm">View All →</a>
+    </div>
+    <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Patient ID</th>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Registered By</th>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+                <% recentPatients.forEach(patient => { %>
+                <tr>
+                    <td class="px-4 py-2 text-sm font-mono"><%= patient.patientId || 'N/A' %></td>
+                    <td class="px-4 py-2"><%= patient.fullName %></td>
+                    <td class="px-4 py-2"><%= patient.registeredBy ? patient.registeredBy.fullName || patient.registeredBy.username : 'N/A' %></td>
+                    <td class="px-4 py-2">
+                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                        <% if (patient.status === 'Active') { %>bg-green-100 text-green-800<% } 
+                        else if (patient.status === 'Recovered') { %>bg-blue-100 text-blue-800<% } 
+                        else { %>bg-red-100 text-red-800<% } %>">
+                            <%= patient.status %>
+                        </span>
+                    </td>
+                    <td class="px-4 py-2">
+                        <a href="/patients/<%= patient._id %>" class="text-indigo-600 hover:text-indigo-900 text-sm">View</a>
+                    </td>
+                </tr>
+                <% }); %>
+                <% if (recentPatients.length === 0) { %>
+                <tr>
+                    <td colspan="5" class="px-4 py-4 text-center text-gray-500">No recent patients</td>
+                </tr>
+                <% } %>
+            </tbody>
+        </table>
+    </div>
+</div>
