@@ -303,6 +303,15 @@
         /* .visible-field {
             display: block;
         } */
+        .field-error {
+            border-color: #ef4444 !important;
+            background-color: #fef2f2 !important;
+        }
+
+        .field-error:focus {
+            border-color: #ef4444 !important;
+            ring: 2px solid #ef4444 !important;
+        }
     </style>
 </head>
 
@@ -405,7 +414,7 @@
                 </div>
             </div>
             <!-- Language -->
-            <div>
+            <div class="hidden">
                 <h4 class="font-medium text-gray-700 dark:text-gray-300 mb-2">
                     <%= t('language') %>
                 </h4>
@@ -620,8 +629,8 @@
             });
         });
         // ========== LOADING SPINNER ==========
-        document.querySelectorAll('form').forEach(form => {
-            form.addEventListener('submit', () => {
+        document.querySelectorAll('form:not(.no-loader)').forEach(form => {
+            form.addEventListener('submit', function (e) {
                 document.getElementById('loadingOverlay').classList.remove('hidden');
             });
         });

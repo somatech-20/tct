@@ -6,65 +6,18 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                 </svg>
             </button>
-            <h1 class="text-xl font-semibold text-gray-800">Welcome, <%= user ? user.username : 'Guest' %>
-            </h1>
-        </div>
-        <div class="flex items-center space-x-3">
-            <% if (user) { %>
-                <span class="px-3 py-1 text-sm rounded-full ...">
-                    <%= user.role==='admin' ? 'Administrator' : (user.role==='doctor' ? 'Doctor/Nurse'
-                        : 'Contact Tracer' ) %>
-                </span>
-                <div
-                    class="w-8 h-8 rounded-full bg-indigo-200 flex items-center justify-center text-indigo-800 font-bold">
-                    <a href="/profile"
-                        class="flex items-center py-2 px-4 hover:bg-indigo-200 <%= currentPath === '/profile'%>">
-                        <%= user.username.charAt(0).toUpperCase() %>
-                    </a>
-                </div>
-                <% } %>
-        </div>
-    </div>
-    <!-d- Language Switcher --d>
-    <div class="flex items-center space-x-2">
-        <select id="headerLangSwitcher" class="text-sm border rounded px-2 py-1">
-            <option value="en" <%=locale==='en' ? 'selected' : '' %>>English</option>
-            <option value="ar" <%=locale==='ar' ? 'selected' : '' %>>العربية</option>
-            <option value="so" <%=locale==='so' ? 'selected' : '' %>>Soomaali</option>
-        </select>
-        <script>
-            document.addEventListener('DOMContentLoaded', () => {
-                const headerLang = document.getElementById('headerLangSwitcher');
-                if (headerLang) {
-                    headerLang.addEventListener('change', (e) => {
-                        window.location.href = `/?lang=${e.target.value}`;
-                    });
-                }
-            });
-        </script>
-    </div>
-</header> -->
-
-<header class="bg-white shadow-sm">
-    <div class="flex justify-between items-center px-4 md:px-6 py-4">
-        <div class="flex items-center space-x-3">
-            <button id="menuToggle" class="menu-toggle text-gray-600 hover:text-gray-900 focus:outline-none md:hidden">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
-            </button>
             <h1 class="text-xl font-semibold text-gray-800">
                 <%= t('welcome') %>, <%= user ? user.username : 'Guest' %>
             </h1>
         </div>
         <div class="flex items-center space-x-4">
-            <!-- Language switcher -->
-            <!-- <select id="headerLangSwitcher" class="text-sm border rounded px-2 py-1">
+            <!l-- Language switcher -h->
+            <!k-- <select id="headerLangSwitcher" class="text-sm border rounded px-2 py-1">
                 <option value="en" <%= locale === 'en' ? 'selected' : '' %>>English</option>
                 <option value="ar" <%= locale === 'ar' ? 'selected' : '' %>>العربية</option>
                 <option value="so" <%= locale === 'so' ? 'selected' : '' %>>Soomaali</option>
-            </select> -->
-            <!-- Language Dropdown -->
+            </select> -h->
+            <!-h- Language Dropdown -k->
             <div class="relative">
                 <button id="langDropdownBtn"
                     class="flex items-center space-x-1 text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-white focus:outline-none">
@@ -102,3 +55,203 @@
         </div>
     </div>
 </header>
+ -->
+
+<header class="bg-white shadow-sm">
+    <div class="flex justify-between items-center px-4 md:px-6 py-4">
+        <div class="flex items-center space-x-3">
+            <button id="menuToggle" class="menu-toggle text-gray-600 hover:text-gray-900 focus:outline-none md:hidden">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+            </button>
+            <h1 class="text-xl font-semibold text-gray-800">Welcome, <%= user ? user.username : 'Guest' %></h1>
+        </div>
+        <div class="flex items-center space-x-4">
+            <!-- Notification Bell -->
+            <% if (user) { %>
+                <div class="relative">
+                    <button id="notificationBell" class="relative text-gray-600 hover:text-gray-900 focus:outline-none">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                        </svg>
+                        <span id="notificationBadge" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center hidden">0</span>
+                    </button>
+                    
+                    <!-- Notification Dropdown -->
+                    <div id="notificationDropdown" class="hidden absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
+                        <div class="p-3 border-b border-gray-200 flex justify-between items-center">
+                            <span class="font-semibold">Notifications</span>
+                            <button id="markAllRead" class="text-xs text-indigo-600 hover:text-indigo-800">Mark all read</button>
+                        </div>
+                        <div id="notificationList" class="max-h-96 overflow-y-auto">
+                            <div class="p-4 text-center text-gray-500 text-sm">Loading...</div>
+                        </div>
+                        <div class="p-2 border-t border-gray-200 text-center">
+                            <a href="/notifications" class="text-sm text-indigo-600 hover:text-indigo-800">View all notifications</a>
+                        </div>
+                    </div>
+                </div>
+            <% } %>
+
+            <!-- Language switcher -->
+            <!-- <select id="headerLangSwitcher" class="text-sm border rounded px-2 py-1">
+                <option value="en" <%= locale === 'en' ? 'selected' : '' %>>English</option>
+                <option value="ar" <%= locale === 'ar' ? 'selected' : '' %>>العربية</option>
+                <option value="so" <%= locale === 'so' ? 'selected' : '' %>>Soomaali</option>
+            </select> -->
+
+            <div class="flex items-center space-x-4">
+            <!-- Language Dropdown -->
+            <div class="relative hidden">
+                <button id="langDropdownBtn"
+                    class="flex items-center space-x-1 text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-white focus:outline-none">
+                    <span class="text-sm font-medium">
+                        <%= locale==='en' ? 'English' : (locale==='ar' ? 'العربية' : 'Soomaali' ) %>
+                    </span>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                </button>
+                <div id="langDropdownMenu"
+                    class="absolute right-0 mt-2 w-32 bg-white dark:bg-gray-800 rounded-md shadow-lg py-1 z-20 hidden">
+                    <a href="#" data-lang="en"
+                        class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 <%= locale === 'en' ? 'bg-gray-100 dark:bg-gray-700' : '' %>">English</a>
+                    <a href="#" data-lang="ar"
+                        class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 <%= locale === 'ar' ? 'bg-gray-100 dark:bg-gray-700' : '' %>">العربية</a>
+                    <a href="#" data-lang="so"
+                        class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 <%= locale === 'so' ? 'bg-gray-100 dark:bg-gray-700' : '' %>">Soomaali</a>
+                </div>
+            </div>
+
+            <!-- User avatar -->
+            <% if (user) { %>
+                <span class="px-3 py-1 text-sm rounded-full 
+                    <%= user.role === 'admin' ? 'bg-purple-100 text-purple-800' : 
+                        (user.role === 'doctor' ? 'bg-indigo-100 text-indigo-800' : 'bg-gray-100 text-gray-800') %>">
+                    <%= user.role === 'admin' ? 'Administrator' : 
+                        (user.role === 'doctor' ? 'Doctor/Nurse' : 'Receptionist') %>
+                </span>
+                <div class="w-8 h-8 rounded-full bg-indigo-200 flex items-center justify-center text-indigo-800 font-bold">
+                    <a href="/profile"><%= user.username.charAt(0).toUpperCase() %></a>
+                </div>
+            <% } %>
+        </div>
+    </div>
+</header>
+
+<script nonce="<%= nonce %>">
+    // ========== NOTIFICATIONS ==========
+    document.addEventListener('DOMContentLoaded', function() {
+        const bell = document.getElementById('notificationBell');
+        const dropdown = document.getElementById('notificationDropdown');
+        const badge = document.getElementById('notificationBadge');
+        const list = document.getElementById('notificationList');
+        const markAllBtn = document.getElementById('markAllRead');
+
+        // Load notifications
+        function loadNotifications() {
+            fetch('/notifications/api/recent')
+                .then(res => res.json())
+                .then(data => {
+                    // Update badge
+                    if (data.unreadCount > 0) {
+                        badge.textContent = data.unreadCount > 9 ? '9+' : data.unreadCount;
+                        badge.classList.remove('hidden');
+                    } else {
+                        badge.classList.add('hidden');
+                    }
+
+                    // Update dropdown list
+                    if (data.notifications && data.notifications.length > 0) {
+                        let html = '';
+                        data.notifications.forEach(n => {
+                            const isUnread = !n.read;
+                            html += `
+                                <div class="p-3 border-b border-gray-100 hover:bg-gray-50 ${isUnread ? 'bg-blue-50' : ''}" data-id="${n._id}">
+                                    <div class="flex items-start justify-between">
+                                        <div class="flex-1">
+                                            <p class="text-sm font-medium ${isUnread ? 'text-gray-900' : 'text-gray-600'}">${n.title}</p>
+                                            <p class="text-xs text-gray-500">${n.message}</p>
+                                            <p class="text-xs text-gray-400 mt-1">${new Date(n.createdAt).toLocaleString()}</p>
+                                        </div>
+                                        ${isUnread ? '<span class="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0 mt-1"></span>' : ''}
+                                    </div>
+                                </div>
+                            `;
+                        });
+                        list.innerHTML = html;
+
+                        // Click to mark as read
+                        list.querySelectorAll('[data-id]').forEach(item => {
+                            item.addEventListener('click', function() {
+                                const id = this.dataset.id;
+                                fetch(`/notifications/api/${id}/read`, { method: 'PUT' })
+                                    .then(() => {
+                                        loadNotifications();
+                                        // If there's a link, redirect
+                                        const notification = data.notifications.find(n => n._id === id);
+                                        if (notification && notification.link) {
+                                            window.location.href = notification.link;
+                                        }
+                                    })
+                                    .catch(err => console.error('Error marking read:', err));
+                            });
+                        });
+                    } else {
+                        list.innerHTML = '<div class="p-4 text-center text-gray-500 text-sm">No notifications</div>';
+                    }
+                })
+                .catch(err => console.error('Error loading notifications:', err));
+        }
+
+        // Toggle dropdown
+        if (bell) {
+            bell.addEventListener('click', function(e) {
+                e.stopPropagation();
+                dropdown.classList.toggle('hidden');
+                if (!dropdown.classList.contains('hidden')) {
+                    loadNotifications();
+                }
+            });
+        }
+
+        // Close dropdown on click outside
+        document.addEventListener('click', function(e) {
+            if (bell && dropdown && !bell.contains(e.target) && !dropdown.contains(e.target)) {
+                dropdown.classList.add('hidden');
+            }
+        });
+
+        // Mark all as read
+        if (markAllBtn) {
+            markAllBtn.addEventListener('click', function() {
+                fetch('/notifications/api/mark-all-read', { method: 'PUT' })
+                    .then(() => {
+                        loadNotifications();
+                        // Update badge
+                        badge.textContent = '0';
+                        badge.classList.add('hidden');
+                    })
+                    .catch(err => console.error('Error marking all read:', err));
+            });
+        }
+
+        // Initial load (for badge)
+        loadNotifications();
+
+        // Refresh notifications every 30 seconds
+        setInterval(loadNotifications, 30000);
+    });
+
+    // ========== LANGUAGE SWITCHER ==========
+    document.addEventListener('DOMContentLoaded', function() {
+        const headerLang = document.getElementById('headerLangSwitcher');
+        if (headerLang) {
+            headerLang.addEventListener('change', function() {
+                const returnUrl = window.location.pathname + window.location.search;
+                window.location.href = `/set-lang?lang=${this.value}&return=${encodeURIComponent(returnUrl)}`;
+            });
+        }
+    });
+</script>

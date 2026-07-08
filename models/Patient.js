@@ -1,6 +1,15 @@
 const mongoose = require('mongoose');
 
 const patientSchema = new mongoose.Schema({
+    patientId: { 
+    type: String, 
+    unique: true,
+    required: true,
+    default: function() {
+      return this.generatePatientId();
+    }
+  },
+
   // Contact Info
   email: { type: String, required: false, lowercase: true, trim: true, unique: true, sparse: true  },
   phone: { type: String, required: false, trim: true },
@@ -55,12 +64,34 @@ const patientSchema = new mongoose.Schema({
   lastReminderSent: { type: Date, default: null }
 });
 
+// Generate unique patient ID (TCT-XXXX)
+patientSchema.methods.generatePatientId = function() {
+  const prefix = 'TCT';
+  const randomNum = Math.floor(1000 + Math.random() * 9000); // 1000-9999
+  return `${prefix}-${randomNum}`;
+};
+
+// Pre-save middleware to ensure patientId exists
+patientSchema.pre('save', function(next) {
+  if (!this.patientId) {
+    this.patientId = this.generatePatientId();
+  }
+  next();
+});
+
 // Indexes for performance
 patientSchema.index({ fullName: 1 });
 patientSchema.index({ district: 1 });
 patientSchema.index({ status: 1 });
 patientSchema.index({ assignedDoctor: 1 });
 patientSchema.index({ isReturnee: 1 });
+
+// In models/Patient.js, add this index
+patientSchema.index({ email: 1 }, { 
+  unique: true, 
+  sparse: true, 
+  partialFilterExpression: { email: { $type: 'string' } } 
+});
 
 // // Unique constraint on fullName (case-insensitive)
 // patientSchema.index({ fullName: 1 }, { 

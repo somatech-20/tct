@@ -10,6 +10,8 @@ const expressLayouts = require('express-ejs-layouts');
 const crypto = require('crypto');
 const i18n = require('i18n');
 require('./cron/dailyReminder');
+require('./cron/notificationReminder');
+const Patient = require('./models/Patient');
 
 // const Setting = require('./models/Setting');
 
@@ -75,27 +77,57 @@ i18n.configure({
 // i18n init
 app.use(i18n.init);
 
-// Middleware to set locale, user info, theme, and current path for all views
+// // Middleware to set locale, user info, theme, and current path for all views
+// app.use((req, res, next) => {
+//   const lang = req.session.lang || 'en';
+
+//   req.setLocale(lang);
+//   res.locals.t = req.__;
+//   res.locals.locale = lang;
+//   // res.locals.locale = req.getLocale();
+//   res.locals.theme = req.session.theme || 'system';
+
+//   // Set user info for views
+//   res.locals.user = req.session.userId
+//     ? {
+//       id: req.session.userId,
+//       role: req.session.userRole,
+//       username: req.session.username,
+//       preferredExportFormat: req.session.preferredExportFormat || 'pdf'
+//     }
+//     : null;
+
+//   res.locals.currentPath = req.path;
+
+//   next();
+// });
+
+// In server.js - find this middleware and update it
 app.use((req, res, next) => {
-  const lang = req.session.lang || 'en';
-
-  req.setLocale(lang);
+  // Language from query or session
+  if (req.query.lang) {
+    req.session.lang = req.query.lang;
+    res.setLocale(req.session.lang);
+  } else if (req.session.lang) {
+    res.setLocale(req.session.lang);
+  }
+  
+  // Expose helpers to all views
   res.locals.t = req.__;
-  res.locals.locale = lang;
-
+  res.locals.locale = req.getLocale();
   res.locals.theme = req.session.theme || 'system';
-
+  
+  // CRITICAL: Always set user, even if null
   res.locals.user = req.session.userId
     ? {
-      id: req.session.userId,
-      role: req.session.userRole,
-      username: req.session.username,
-      preferredExportFormat: req.session.preferredExportFormat || 'pdf'
-    }
-    : null;
-
+        id: req.session.userId,
+        role: req.session.userRole,
+        username: req.session.username,
+        preferredExportFormat: req.session.preferredExportFormat || 'pdf'
+      }
+    : null;  // Explicitly null when not logged in
+  
   res.locals.currentPath = req.path;
-
   next();
 });
 
@@ -152,6 +184,8 @@ app.use('/patients/:patientId/treatments', require('./routes/treatmentRoutes'));
 app.use('/patients/:patientId/contacts', require('./routes/contactRoutes'));
 app.use('/users', require('./routes/userRoutes'));
 app.use('/profile', require('./routes/profileRoutes'));
+app.use('/notifications', require('./routes/notificationRoutes'));
+app.use('/reports', require('./routes/reportRoutes'));
 
 // Redirect root to dashboard or login
 app.get('/', (req, res) => {
@@ -207,6 +241,55 @@ app.post('/api/settings/email', async (req, res) => {
     { upsert: true }
   );
   res.json({ success: true });
+});
+
+// API endpoint for searching patients (used by returnee lookup)
+app.get('/api/patients/search', async (req, res) => {
+  try {
+    const { query, exclude } = req.query;
+    
+    if (!query || query.length < 2) {
+      return res.json([]);
+    }
+    
+    // Only show patients who are NOT active (recovered or defaulted)
+    // These are patients who have completed their treatment
+    const patients = await Patient.find({
+      $and: [
+        {
+          $or: [
+            { fullName: { $regex: query, $options: 'i' } },
+            { phone: { $regex: query, $options: 'i' } },
+            { email: { $regex: query, $options: 'i' } },
+            { patientId: { $regex: query, $options: 'i' } }
+          ]
+        },
+        { status: { $in: ['Recovered', 'Defaulted'] } }, // Only completed cases
+        { _id: { $ne: exclude || null } } // Exclude current patient
+      ]
+    })
+    .limit(10)
+    .select('fullName phone email district treatmentStartDate gender age patientId status');
+    
+    res.json(patients);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Search failed' });
+  }
+});
+
+// Test route for creating a notification
+app.get('/test-notification', async (req, res) => {
+  if (!req.session.userId) return res.redirect('/login');
+  const Notification = require('./models/Notification');
+  await Notification.create({
+    user: req.session.userId,
+    type: 'TREATMENT_REMINDER',
+    title: 'Test Notification',
+    message: 'This is a test notification to verify the system is working.',
+    link: '/dashboard'
+  });
+  res.send('Test notification created');
 });
 
 // 404 handler

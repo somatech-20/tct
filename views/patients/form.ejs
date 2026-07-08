@@ -4,7 +4,7 @@
     </h2>
 
     <!-- Display validation errors -->
-    <% if (locals.errors && errors.length> 0) { %>
+    <!-- <% if (locals.errors && errors.length> 0) { %>
         <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
             <strong class="font-bold">Please fix the following errors:</strong>
             <ul class="list-disc list-inside mt-2">
@@ -15,264 +15,665 @@
                     <% }); %>
             </ul>
         </div>
+        <% } %> -->
+    <!-- Display validation errors with field highlighting -->
+    <% if (locals.errors && errors.length> 0) { %>
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+            <strong class="font-bold">Please fix the following errors:</strong>
+            <ul class="list-disc list-inside mt-2">
+                <% errors.forEach(function(error) { %>
+                    <li>
+                        <span class="font-semibold">
+                            <%= error.field || 'Unknown field' %>:
+                        </span>
+                        <%= error.msg %>
+                            <% if (error.value) { %>
+                                <span class="text-xs text-gray-500">(Value: "<%= error.value %>")</span>
+                                <% } %>
+                    </li>
+                    <% }); %>
+            </ul>
+        </div>
         <% } %>
 
-            <form method="POST"
-                action="<%= locals.action || (patient && patient._id ? '/patients/'+patient._id+'?_method=PUT' : '/patients') %>">
-                <!-- Email -->
+            <% if (patient && patient.patientId) { %>
                 <div class="mb-4">
-                    <label for="email" class="block text-gray-700 text-sm font-bold mb-2">Email</label>
-                    <input id="email" type="email" name="email" value="<%= patient ? patient.email : '' %>"
-                        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Patient ID</label>
+                    <div class="font-mono bg-gray-100 px-3 py-2 rounded border">
+                        <%= patient.patientId %>
+                    </div>
                 </div>
+                <% } %>
+                    <form method="POST"
+                        action="<%= locals.action || (patient && patient._id ? '/patients/'+patient._id+'?_method=PUT' : '/patients') %>">
+                        <!-- Email -->
+                        <div class="mb-4">
+                            <label for="email" class="block text-gray-700 text-sm font-bold mb-2">Email</label>
+                            <input id="email" type="email" name="email" value="<%= patient ? patient.email : '' %>"
+                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                            <% if (locals.errors && errors.some(e=> e.field === 'email')) { %>
+                                <p class="text-red-500 text-xs mt-1">
+                                    <%= errors.find(e=> e.field === 'email').msg %>
+                                </p>
+                                <% } %>
+                        </div>
 
-                <!-- Phone -->
-                <div class="mb-4">
-                    <label for="phone" class="block text-gray-700 text-sm font-bold mb-2">Phone</label>
-                    <input id="phone" type="tel" name="phone" value="<%= patient ? patient.phone : '' %>"
-                        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-                </div>
+                        <!-- Phone -->
+                        <div class="mb-4">
+                            <label for="phone" class="block text-gray-700 text-sm font-bold mb-2">Phone</label>
+                            <input id="phone" type="tel" name="phone" value="<%= patient ? patient.phone : '' %>"
+                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                            <% if (locals.errors && errors.some(e=> e.field === 'phone')) { %>
+                                <p class="text-red-500 text-xs mt-1">
+                                    <%= errors.find(e=> e.field === 'phone').msg %>
+                                </p>
+                                <% } %>
+                        </div>
 
-                <!-- Full Name -->
-                <div class="mb-4">
-                    <label for="fullName" class="block text-gray-700 text-sm font-bold mb-2">Full Name</label>
-                    <input id="fullName" type="text" name="fullName" value="<%= patient ? patient.fullName : '' %>"
-                        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                        required>
-                </div>
+                        <!-- Full Name -->
+                        <div class="mb-4">
+                            <label for="fullName" class="block text-gray-700 text-sm font-bold mb-2">Full Name</label>
+                            <input id="fullName" type="text" name="fullName"
+                                value="<%= patient ? patient.fullName : '' %>"
+                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                required>
+                            <% if (locals.errors && errors.some(e=> e.field === 'fullName')) { %>
+                                <p class="text-red-500 text-xs mt-1">
+                                    <%= errors.find(e=> e.field === 'fullName').msg %>
+                                </p>
+                                <% } %>
+                        </div>
 
-                <!-- Marital Status -->
-                <div class="mb-4">
-                    <label for="maritalStatus" class="block text-gray-700 text-sm font-bold mb-2">Marital Status</label>
-                    <select id="maritalStatus" name="maritalStatus"
-                        class="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-                        <option value="">Select</option>
-                        <option value="Single" <%=(patient && patient.maritalStatus==='Single' ) ? 'selected' : '' %>
-                            >Single</option>
-                        <option value="Married" <%=(patient && patient.maritalStatus==='Married' ) ? 'selected' : '' %>
-                            >Married</option>
-                        <option value="Divorced" <%=(patient && patient.maritalStatus==='Divorced' ) ? 'selected' : ''
-                            %>>Divorced</option>
-                        <option value="Widowed" <%=(patient && patient.maritalStatus==='Widowed' ) ? 'selected' : '' %>
-                            >Widowed</option>
-                    </select>
-                </div>
+                        <!-- Marital Status -->
+                        <div class="mb-4">
+                            <label for="maritalStatus" class="block text-gray-700 text-sm font-bold mb-2">Marital
+                                Status</label>
+                            <select id="maritalStatus" name="maritalStatus"
+                                class="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                                <option value="">Select</option>
+                                <option value="Single" <%=(patient && patient.maritalStatus==='Single' ) ? 'selected'
+                                    : '' %>
+                                    >Single</option>
+                                <option value="Married" <%=(patient && patient.maritalStatus==='Married' ) ? 'selected'
+                                    : '' %>
+                                    >Married</option>
+                                <option value="Divorced" <%=(patient && patient.maritalStatus==='Divorced' )
+                                    ? 'selected' : '' %>>Divorced</option>
+                                <option value="Widowed" <%=(patient && patient.maritalStatus==='Widowed' ) ? 'selected'
+                                    : '' %>
+                                    >Widowed</option>
+                            </select>
+                            <% if (locals.errors && errors.some(e=> e.field === 'maritalStatus')) { %>
+                                <p class="text-red-500 text-xs mt-1">
+                                    <%= errors.find(e=> e.field === 'maritalStatus').msg %>
+                                </p>
+                                <% } %>
+                        </div>
 
-                <!-- District -->
-                <div class="mb-4">
-                    <label for="district" class="block text-gray-700 text-sm font-bold mb-2">District (Banadir
-                        Region)</label>
-                    <select id="district" name="district"
-                        class="shadow-sm border border-gray-300 rounded-lg w-full py-2.5 px-3 text-gray-700 bg-white leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow"
-                        required>
-                        <option value="" disabled <%=(!patient || !patient.district) ? 'selected' : '' %>>Select
-                            District</option>
-                        <option value="Hodan" <%=(patient && patient.district==='Hodan' ) ? 'selected' : '' %>>Hodan
-                        </option>
-                        <option value="Abdiaziz" <%=(patient && patient.district==='Abdiaziz' ) ? 'selected' : '' %>
-                            >Abdiaziz</option>
-                        <option value="Bondhere" <%=(patient && patient.district==='Bondhere' ) ? 'selected' : '' %>
-                            >Bondhere</option>
-                        <option value="Daynile" <%=(patient && patient.district==='Daynile' ) ? 'selected' : '' %>
-                            >Daynile</option>
-                        <option value="Dharkenley" <%=(patient && patient.district==='Dharkenley' ) ? 'selected' : '' %>
-                            >Dharkenley</option>
-                        <option value="Hamar-Jajab" <%=(patient && patient.district==='Hamar-Jajab' ) ? 'selected' : ''
-                            %>>Hamar-Jajab</option>
-                        <option value="Hamar-Weyne" <%=(patient && patient.district==='Hamar-Weyne' ) ? 'selected' : ''
-                            %>>Hamar-Weyne</option>
-                        <option value="Howl-Wadag" <%=(patient && patient.district==='Howl-Wadag' ) ? 'selected' : '' %>
-                            >Howl-Wadag</option>
-                        <option value="Huriwa" <%=(patient && patient.district==='Huriwa' ) ? 'selected' : '' %>>Huriwa
-                        </option>
-                        <option value="Kaxda" <%=(patient && patient.district==='Kaxda' ) ? 'selected' : '' %>>Kaxda
-                        </option>
-                        <option value="Karan" <%=(patient && patient.district==='Karan' ) ? 'selected' : '' %>>Karan
-                        </option>
-                        <option value="Shangani" <%=(patient && patient.district==='Shangani' ) ? 'selected' : '' %>
-                            >Shangani</option>
-                        <option value="Shibis" <%=(patient && patient.district==='Shibis' ) ? 'selected' : '' %>>Shibis
-                        </option>
-                        <option value="Waberi" <%=(patient && patient.district==='Waberi' ) ? 'selected' : '' %>>Waberi
-                        </option>
-                        <option value="Wadajir" <%=(patient && patient.district==='Wadajir' ) ? 'selected' : '' %>
-                            >Wadajir</option>
-                        <option value="Warta Nabada" <%=(patient && patient.district==='Warta Nabada' ) ? 'selected'
-                            : '' %>>Warta Nabada</option>
-                        <option value="Yaqshid" <%=(patient && patient.district==='Yaqshid' ) ? 'selected' : '' %>
-                            >Yaqshid</option>
-                        <option value="Daarusalaam" <%=(patient && patient.district==='Daarusalaam' ) ? 'selected' : ''
-                            %>>Daarusalaam</option>
-                        <option value="Garasbaaley" <%=(patient && patient.district==='Garasbaaley' ) ? 'selected' : ''
-                            %>>Garasbaaley</option>
-                        <option value="Gubadle" <%=(patient && patient.district==='Gubadle' ) ? 'selected' : '' %>
-                            >Gubadle</option>
-                    </select>
-                </div>
+                        <!-- District -->
+                        <div class="mb-4">
+                            <label for="district" class="block text-gray-700 text-sm font-bold mb-2">District (Banadir
+                                Region)</label>
+                            <select id="district" name="district"
+                                class="shadow-sm border border-gray-300 rounded-lg w-full py-2.5 px-3 text-gray-700 bg-white leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow"
+                                required>
+                                <option value="" disabled <%=(!patient || !patient.district) ? 'selected' : '' %>>Select
+                                    District</option>
+                                <option value="Hodan" <%=(patient && patient.district==='Hodan' ) ? 'selected' : '' %>
+                                    >Hodan
+                                </option>
+                                <option value="Abdiaziz" <%=(patient && patient.district==='Abdiaziz' ) ? 'selected'
+                                    : '' %>
+                                    >Abdiaziz</option>
+                                <option value="Bondhere" <%=(patient && patient.district==='Bondhere' ) ? 'selected'
+                                    : '' %>
+                                    >Bondhere</option>
+                                <option value="Daynile" <%=(patient && patient.district==='Daynile' ) ? 'selected' : ''
+                                    %>
+                                    >Daynile</option>
+                                <option value="Dharkenley" <%=(patient && patient.district==='Dharkenley' ) ? 'selected'
+                                    : '' %>
+                                    >Dharkenley</option>
+                                <option value="Hamar-Jajab" <%=(patient && patient.district==='Hamar-Jajab' )
+                                    ? 'selected' : '' %>>Hamar-Jajab</option>
+                                <option value="Hamar-Weyne" <%=(patient && patient.district==='Hamar-Weyne' )
+                                    ? 'selected' : '' %>>Hamar-Weyne</option>
+                                <option value="Howl-Wadag" <%=(patient && patient.district==='Howl-Wadag' ) ? 'selected'
+                                    : '' %>
+                                    >Howl-Wadag</option>
+                                <option value="Huriwa" <%=(patient && patient.district==='Huriwa' ) ? 'selected' : '' %>
+                                    >Huriwa
+                                </option>
+                                <option value="Kaxda" <%=(patient && patient.district==='Kaxda' ) ? 'selected' : '' %>
+                                    >Kaxda
+                                </option>
+                                <option value="Karan" <%=(patient && patient.district==='Karan' ) ? 'selected' : '' %>
+                                    >Karan
+                                </option>
+                                <option value="Shangani" <%=(patient && patient.district==='Shangani' ) ? 'selected'
+                                    : '' %>
+                                    >Shangani</option>
+                                <option value="Shibis" <%=(patient && patient.district==='Shibis' ) ? 'selected' : '' %>
+                                    >Shibis
+                                </option>
+                                <option value="Waberi" <%=(patient && patient.district==='Waberi' ) ? 'selected' : '' %>
+                                    >Waberi
+                                </option>
+                                <option value="Wadajir" <%=(patient && patient.district==='Wadajir' ) ? 'selected' : ''
+                                    %>
+                                    >Wadajir</option>
+                                <option value="Warta Nabada" <%=(patient && patient.district==='Warta Nabada' )
+                                    ? 'selected' : '' %>>Warta Nabada</option>
+                                <option value="Yaqshid" <%=(patient && patient.district==='Yaqshid' ) ? 'selected' : ''
+                                    %>
+                                    >Yaqshid</option>
+                                <option value="Daarusalaam" <%=(patient && patient.district==='Daarusalaam' )
+                                    ? 'selected' : '' %>>Daarusalaam</option>
+                                <option value="Garasbaaley" <%=(patient && patient.district==='Garasbaaley' )
+                                    ? 'selected' : '' %>>Garasbaaley</option>
+                                <option value="Gubadle" <%=(patient && patient.district==='Gubadle' ) ? 'selected' : ''
+                                    %>
+                                    >Gubadle</option>
+                            </select>
+                            <% if (locals.errors && errors.some(e=> e.field === 'district')) { %>
+                                <p class="text-red-500 text-xs mt-1">
+                                    <%= errors.find(e=> e.field === 'district').msg %>
+                                </p>
+                                <% } %>
+                        </div>
 
-                <!-- Returnee Flag -->
-                <div class="mb-4">
+                        <!-- Returnee Flag -->
+                        <!-- <div class="mb-4">
                     <label class="flex items-center">
                         <input id="isReturnee" type="checkbox" name="isReturnee" <%=(patient && patient.isReturnee)
                             ? 'checked' : '' %> class="mr-2">
                         <span class="text-gray-700 text-sm font-bold">Is this a returnee (recurrent) patient?</span>
                     </label>
-                </div>
-
-                <!-- Previous Treatment Date -->
-                <div class="mb-4" id="previousTreatmentDateContainer"
-                    style="display: <%= (patient && patient.isReturnee) ? 'block' : 'none' %>;">
-                    <label for="previousTreatmentDate" class="block text-gray-700 text-sm font-bold mb-2">Previous
-                        Treatment Date</label>
-                    <input id="previousTreatmentDate" type="date" name="previousTreatmentDate"
-                        value="<%= (patient && patient.previousTreatmentDate) ? patient.previousTreatmentDate.toISOString().split('T')[0] : '' %>"
-                        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-                </div>
-
-                <!-- Emergency Contact -->
-                <div class="mb-4">
-                    <h3 class="text-md font-bold mb-2">Emergency Contact</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div>
-                            <label for="emergencyContactName"
-                                class="block text-gray-700 text-sm font-bold mb-2">Name</label>
-                            <input id="emergencyContactName" type="text" name="emergencyContact[name]"
-                                value="<%= (patient && patient.emergencyContact) ? patient.emergencyContact.name : '' %>"
-                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                </div> -->
+                        <!-- Returnee Flag -->
+                        <div class="mb-4">
+                            <label class="flex items-center">
+                                <input id="isReturnee" type="checkbox" name="isReturnee" <%=(patient &&
+                                    patient.isReturnee) ? 'checked' : '' %> class="mr-2">
+                                <span class="text-gray-700 text-sm font-bold">Is this a returnee (recurrent)
+                                    patient?</span>
+                                <span class="text-gray-400 text-xs font-normal ml-2">(Check if patient has been treated
+                                    before)</span>
+                            </label>
+                            <!-- Hidden input to ensure "false" is sent when unchecked -->
+                            <input type="hidden" name="isReturnee" value="off">
+                            <!-- The "Search Previous Patient" button will be inserted here by JavaScript -->
+                            <% if (locals.errors && errors.some(e=> e.field === 'isReturnee')) { %>
+                                <p class="text-red-500 text-xs mt-1">
+                                    <%= errors.find(e=> e.field === 'isReturnee').msg %>
+                                </p>
+                                <% } %>
                         </div>
-                        <div>
-                            <label for="emergencyContactRelationship"
-                                class="block text-gray-700 text-sm font-bold mb-2">Relationship</label>
-                            <input id="emergencyContactRelationship" type="text" name="emergencyContact[relationship]"
-                                value="<%= (patient && patient.emergencyContact) ? patient.emergencyContact.relationship : '' %>"
-                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-                        </div>
-                        <div>
-                            <label for="emergencyContactPhone"
-                                class="block text-gray-700 text-sm font-bold mb-2">Phone</label>
-                            <input id="emergencyContactPhone" type="tel" name="emergencyContact[phone]"
-                                value="<%= (patient && patient.emergencyContact) ? patient.emergencyContact.phone : '' %>"
-                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-                        </div>
-                    </div>
-                </div>
 
-                <!-- Assign to Doctor -->
-                <div class="mb-4">
-                    <label for="assignedDoctor" class="block text-gray-700 text-sm font-bold mb-2">Assign to
-                        Doctor</label>
-                    <select id="assignedDoctor" name="assignedDoctor"
-                        class="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-                        <option value="">Unassigned</option>
-                        <% if (doctors && doctors.length) { %>
-                            <% doctors.forEach(function(doctor) { %>
-                                <option value="<%= doctor._id %>" <%=(patient && patient.assignedDoctor &&
-                                    patient.assignedDoctor._id &&
-                                    patient.assignedDoctor._id.toString()===doctor._id.toString()) ? 'selected' : '' %>>
-                                    <%= doctor.fullName || doctor.username %>
+                        <!-- Previous Treatment Date -->
+                        <div class="mb-4" id="previousTreatmentDateContainer"
+                            style="display: <%= (patient && patient.isReturnee) ? 'block' : 'none' %>;">
+                            <label for="previousTreatmentDate"
+                                class="block text-gray-700 text-sm font-bold mb-2">Previous
+                                Treatment Date</label>
+                            <input id="previousTreatmentDate" type="date" name="previousTreatmentDate"
+                                value="<%= (patient && patient.previousTreatmentDate) ? patient.previousTreatmentDate.toISOString().split('T')[0] : '' %>"
+                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                            <% if (locals.errors && errors.some(e=> e.field === 'previousTreatmentDate')) { %>
+                                <p class="text-red-500 text-xs mt-1">
+                                    <%= errors.find(e=> e.field === 'previousTreatmentDate').msg %>
+                                </p>
+                                <% } %>
+                        </div>
+
+                        <!-- Emergency Contact -->
+                        <div class="mb-4">
+                            <h3 class="text-md font-bold mb-2">Emergency Contact</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div>
+                                    <label for="emergencyContactName"
+                                        class="block text-gray-700 text-sm font-bold mb-2">Name</label>
+                                    <input id="emergencyContactName" type="text" name="emergencyContact[name]"
+                                        value="<%= (patient && patient.emergencyContact) ? patient.emergencyContact.name : '' %>"
+                                        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                                    <% if (locals.errors && errors.some(e=> e.field === 'emergencyContactName')) { %>
+                                        <p class="text-red-500 text-xs mt-1">
+                                            <%= errors.find(e=> e.field === 'emergencyContactName').msg %>
+                                        </p>
+                                        <% } %>
+                                </div>
+                                <div>
+                                    <label for="emergencyContactRelationship"
+                                        class="block text-gray-700 text-sm font-bold mb-2">Relationship</label>
+                                    <input id="emergencyContactRelationship" type="text"
+                                        name="emergencyContact[relationship]"
+                                        value="<%= (patient && patient.emergencyContact) ? patient.emergencyContact.relationship : '' %>"
+                                        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                                    <% if (locals.errors && errors.some(e=> e.field === 'emergencyContactRelationship'))
+                                        { %>
+                                        <p class="text-red-500 text-xs mt-1">
+                                            <%= errors.find(e=> e.field === 'emergencyContactRelationship').msg %>
+                                        </p>
+                                        <% } %>
+                                </div>
+                                <div>
+                                    <label for="emergencyContactPhone"
+                                        class="block text-gray-700 text-sm font-bold mb-2">Phone</label>
+                                    <input id="emergencyContactPhone" type="tel" name="emergencyContact[phone]"
+                                        value="<%= (patient && patient.emergencyContact) ? patient.emergencyContact.phone : '' %>"
+                                        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                                    <% if (locals.errors && errors.some(e=> e.field === 'emergencyContactPhone')) { %>
+                                        <p class="text-red-500 text-xs mt-1">
+                                            <%= errors.find(e=> e.field === 'emergencyContactPhone').msg %>
+                                        </p>
+                                        <% } %>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Assign to Doctor -->
+                        <div class="mb-4">
+                            <label for="assignedDoctor" class="block text-gray-700 text-sm font-bold mb-2">Assign to
+                                Doctor</label>
+                            <select id="assignedDoctor" name="assignedDoctor"
+                                class="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                                <option value="">Unassigned</option>
+                                <% if (doctors && doctors.length) { %>
+                                    <% doctors.forEach(function(doctor) { %>
+                                        <option value="<%= doctor._id %>" <%=(patient && patient.assignedDoctor &&
+                                            patient.assignedDoctor._id &&
+                                            patient.assignedDoctor._id.toString()===doctor._id.toString()) ? 'selected'
+                                            : '' %>>
+                                            <%= doctor.fullName || doctor.username %>
+                                        </option>
+                                        <% }); %>
+                                            <% } %>
+                            </select>
+                            <% if (locals.errors && errors.some(e=> e.field === 'assignedDoctor')) { %>
+                                <p class="text-red-500 text-xs mt-1">
+                                    <%= errors.find(e=> e.field === 'assignedDoctor').msg %>
+                                </p>
+                                <% } %>
+                        </div>
+
+                        <!-- Age & Gender -->
+                        <div class="grid grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <label for="age" class="block text-gray-700 text-sm font-bold mb-2">Age</label>
+                                <input id="age" type="number" name="age" value="<%= patient ? patient.age : '' %>"
+                                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                    required>
+                            </div>
+                            <div>
+                                <label for="gender" class="block text-gray-700 text-sm font-bold mb-2">Gender</label>
+                                <select id="gender" name="gender"
+                                    class="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                    required>
+                                    <option value="" disabled <%=(!patient || !patient.gender) ? 'selected' : '' %>
+                                        >Select
+                                        Gender</option>
+                                    <option value="Male" <%=(patient && patient.gender==='Male' ) ? 'selected' : '' %>
+                                        >Male
+                                    </option>
+                                    <option value="Female" <%=(patient && patient.gender==='Female' ) ? 'selected' : ''
+                                        %>
+                                        >Female</option>
+                                </select>
+                            </div>
+                            <% if (locals.errors && errors.some(e=> e.field === 'gender')) { %>
+                                <p class="text-red-500 text-xs mt-1">
+                                    <%= errors.find(e=> e.field === 'gender').msg %>
+                                </p>
+                                <% } %>
+                        </div>
+
+                        <!-- TB Type & Treatment Start -->
+                        <div class="grid grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <label for="tbType" class="block text-gray-700 text-sm font-bold mb-2">TB Type</label>
+                                <select id="tbType" name="tbType"
+                                    class="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                    required>
+                                    <option value="" disabled <%=(!patient || !patient.tbType) ? 'selected' : '' %>
+                                        >Select TB
+                                        Type</option>
+                                    <option value="Pulmonary" <%=(patient && patient.tbType==='Pulmonary' ) ? 'selected'
+                                        : '' %>
+                                        >Pulmonary</option>
+                                    <option value="Extra-pulmonary" <%=(patient && patient.tbType==='Extra-pulmonary' )
+                                        ? 'selected' : '' %>>Extra-pulmonary</option>
+                                </select>
+                            </div>
+                            <% if (locals.errors && errors.some(e=> e.field === 'tbType')) { %>
+                                <p class="text-red-500 text-xs mt-1">
+                                    <%= errors.find(e=> e.field === 'tbType').msg %>
+                                </p>
+                                <% } %>
+                                    <div>
+                                        <label for="treatmentStartDate"
+                                            class="block text-gray-700 text-sm font-bold mb-2">Treatment
+                                            Start Date</label>
+                                        <input id="treatmentStartDate" type="date" name="treatmentStartDate"
+                                            value="<%= (patient && patient.treatmentStartDate) ? patient.treatmentStartDate.toISOString().split('T')[0] : '' %>"
+                                            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                            required>
+                                    </div>
+                                    <% if (locals.errors && errors.some(e=> e.field === 'treatmentStartDate')) { %>
+                                        <p class="text-red-500 text-xs mt-1">
+                                            <%= errors.find(e=> e.field === 'treatmentStartDate').msg %>
+                                        </p>
+                                        <% } %>
+                        </div>
+
+                        <!-- Status -->
+                        <div class="mb-6">
+                            <label for="status" class="block text-gray-700 text-sm font-bold mb-2">Status</label>
+                            <select id="status" name="status"
+                                class="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                required>
+                                <option value="" disabled <%=(!patient || !patient.status) ? 'selected' : '' %>>Select
+                                    Status
                                 </option>
-                                <% }); %>
-                                    <% } %>
-                    </select>
-                </div>
+                                <option value="Active" <%=(patient && patient.status==='Active' ) ? 'selected' : '' %>
+                                    >Active
+                                </option>
+                                <option value="Recovered" <%=(patient && patient.status==='Recovered' ) ? 'selected'
+                                    : '' %>
+                                    >Recovered</option>
+                                <option value="Defaulted" <%=(patient && patient.status==='Defaulted' ) ? 'selected'
+                                    : '' %>
+                                    >Defaulted</option>
+                            </select>
+                            <% if (locals.errors && errors.some(e=> e.field === 'status')) { %>
+                                <p class="text-red-500 text-xs mt-1">
+                                    <%= errors.find(e=> e.field === 'status').msg %>
+                                </p>
+                                <% } %>
+                        </div>
 
-                <!-- Age & Gender -->
-                <div class="grid grid-cols-2 gap-4 mb-4">
-                    <div>
-                        <label for="age" class="block text-gray-700 text-sm font-bold mb-2">Age</label>
-                        <input id="age" type="number" name="age" value="<%= patient ? patient.age : '' %>"
-                            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                            required>
-                    </div>
-                    <div>
-                        <label for="gender" class="block text-gray-700 text-sm font-bold mb-2">Gender</label>
-                        <select id="gender" name="gender"
-                            class="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                            required>
-                            <option value="" disabled <%=(!patient || !patient.gender) ? 'selected' : '' %>>Select
-                                Gender</option>
-                            <option value="Male" <%=(patient && patient.gender==='Male' ) ? 'selected' : '' %>>Male
-                            </option>
-                            <option value="Female" <%=(patient && patient.gender==='Female' ) ? 'selected' : '' %>
-                                >Female</option>
-                        </select>
-                    </div>
-                </div>
+                        <div class="flex items-center justify-between">
+                            <button type="submit"
+                                class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Save</button>
+                            <a href="/patients"
+                                class="inline-block align-baseline font-bold text-sm text-indigo-600 hover:text-indigo-800">Cancel</a>
+                        </div>
+                    </form>
+                    <!-- Returnee Patient Lookup Modal -->
+                    <div id="returneeModal"
+                        class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 hidden">
+                        <div
+                            class="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-2/3 shadow-lg rounded-md bg-white dark:bg-gray-800">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="text-lg font-bold">Search Previous Patient</h3>
+                                <button id="closeReturneeModal"
+                                    class="text-gray-400 hover:text-gray-600">&times;</button>
+                            </div>
 
-                <!-- TB Type & Treatment Start -->
-                <div class="grid grid-cols-2 gap-4 mb-4">
-                    <div>
-                        <label for="tbType" class="block text-gray-700 text-sm font-bold mb-2">TB Type</label>
-                        <select id="tbType" name="tbType"
-                            class="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                            required>
-                            <option value="" disabled <%=(!patient || !patient.tbType) ? 'selected' : '' %>>Select TB
-                                Type</option>
-                            <option value="Pulmonary" <%=(patient && patient.tbType==='Pulmonary' ) ? 'selected' : '' %>
-                                >Pulmonary</option>
-                            <option value="Extra-pulmonary" <%=(patient && patient.tbType==='Extra-pulmonary' )
-                                ? 'selected' : '' %>>Extra-pulmonary</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label for="treatmentStartDate" class="block text-gray-700 text-sm font-bold mb-2">Treatment
-                            Start Date</label>
-                        <input id="treatmentStartDate" type="date" name="treatmentStartDate"
-                            value="<%= (patient && patient.treatmentStartDate) ? patient.treatmentStartDate.toISOString().split('T')[0] : '' %>"
-                            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                            required>
-                    </div>
-                </div>
+                            <!-- Search Input -->
+                            <div class="mb-4">
+                                <input type="text" id="returneeSearch" placeholder="Search by name, phone, or email..."
+                                    class="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            </div>
 
-                <!-- Status -->
-                <div class="mb-6">
-                    <label for="status" class="block text-gray-700 text-sm font-bold mb-2">Status</label>
-                    <select id="status" name="status"
-                        class="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                        required>
-                        <option value="" disabled <%=(!patient || !patient.status) ? 'selected' : '' %>>Select Status
-                        </option>
-                        <option value="Active" <%=(patient && patient.status==='Active' ) ? 'selected' : '' %>>Active
-                        </option>
-                        <option value="Recovered" <%=(patient && patient.status==='Recovered' ) ? 'selected' : '' %>
-                            >Recovered</option>
-                        <option value="Defaulted" <%=(patient && patient.status==='Defaulted' ) ? 'selected' : '' %>
-                            >Defaulted</option>
-                    </select>
-                </div>
+                            <!-- Results -->
+                            <div id="returneeResults" class="max-h-96 overflow-y-auto">
+                                <p class="text-gray-500 text-sm">Type at least 2 characters to search...</p>
+                            </div>
 
-                <div class="flex items-center justify-between">
-                    <button type="submit"
-                        class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Save</button>
-                    <a href="/patients"
-                        class="inline-block align-baseline font-bold text-sm text-indigo-600 hover:text-indigo-800">Cancel</a>
-                </div>
-            </form>
+                            <!-- Selected Patient Preview -->
+                            <div id="selectedPatientPreview"
+                                class="mt-4 p-3 bg-gray-50 dark:bg-gray-700 rounded hidden">
+                                <h4 class="font-semibold mb-2">Selected Patient:</h4>
+                                <div class="grid grid-cols-2 gap-2 text-sm">
+                                    <div><span class="font-medium">Name:</span> <span id="selectedName"></span></div>
+                                    <div><span class="font-medium">Phone:</span> <span id="selectedPhone"></span></div>
+                                    <div><span class="font-medium">District:</span> <span id="selectedDistrict"></span>
+                                    </div>
+                                    <div><span class="font-medium">Previous Treatment Date:</span> <span
+                                            id="selectedTreatmentDate"></span></div>
+                                </div>
+                            </div>
+
+                            <div class="mt-4 flex justify-end space-x-2">
+                                <button id="cancelReturneeSearch"
+                                    class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded">Cancel</button>
+                                <button id="confirmReturneeSelection"
+                                    class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded hidden">Apply
+                                    to
+                                    Form</button>
+                            </div>
+                        </div>
+                    </div>
 </div>
 
 <script nonce="<%= nonce %>">
     document.addEventListener('DOMContentLoaded', function () {
-        var checkbox = document.querySelector('[name="isReturnee"]');
-        var container = document.getElementById('previousTreatmentDateContainer');
+        // ===== RETURNE PATIENT LOOKUP =====
+        const returneeCheckbox = document.querySelector('[name="isReturnee"]');
+        const searchBtn = document.getElementById('searchReturneeBtn');
+        const modal = document.getElementById('returneeModal');
+        const closeModal = document.getElementById('closeReturneeModal');
+        const cancelSearch = document.getElementById('cancelReturneeSearch');
+        const searchInput = document.getElementById('returneeSearch');
+        const resultsContainer = document.getElementById('returneeResults');
+        const previewContainer = document.getElementById('selectedPatientPreview');
+        const confirmBtn = document.getElementById('confirmReturneeSelection');
 
-        if (checkbox && container) {
-            var input = container.querySelector('input');
+        let selectedPatient = null;
+        let searchTimeout = null;
+        let currentPatientId = '<%= patient && patient._id ? patient._id : "" %>';
 
-            function togglePreviousTreatmentDate() {
-                if (checkbox.checked) {
-                    container.style.display = 'block';
-                    if (input) input.required = true;
+        // Show search button when returnee is checked/clicked (not if thhe checkbox exists only)
+        if (returneeCheckbox) {
+            const searchBtnContainer = document.createElement('div');
+            searchBtnContainer.className = 'mt-2';
+            searchBtnContainer.id = 'searchBtnContainer';
+
+            searchBtnContainer.innerHTML = `
+                    <button type="button" id="searchReturneeBtn"
+                        class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded text-sm flex items-center">
+                        <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                        </svg>
+                        Search and Select the previous data patient from the database 
+                    </button>
+                `;
+
+            returneeCheckbox.closest('.mb-4').appendChild(searchBtnContainer);
+
+            function toggleReturneeUI() {
+                if (returneeCheckbox.checked) {
+                    searchBtnContainer.style.display = 'block';
+                    previousTreatmentDateContainer.style.display = 'block';
+                    // Set the hidden input value to "on"
+                    const hiddenInput = document.querySelector('input[name="isReturnee"][type="hidden"]');
+                    if (hiddenInput) hiddenInput.value = 'on';
                 } else {
-                    container.style.display = 'none';
-                    if (input) {
-                        input.required = false;
-                        input.value = '';
-                    }
+                    searchBtnContainer.style.display = 'none';
+                    previousTreatmentDateContainer.style.display = 'none';
+                    // Set the hidden input value to "off"
+                    const hiddenInput = document.querySelector('input[name="isReturnee"][type="hidden"]');
+                    if (hiddenInput) hiddenInput.value = 'off';
                 }
             }
 
-            checkbox.addEventListener('change', togglePreviousTreatmentDate);
-            togglePreviousTreatmentDate();
+            returneeCheckbox.addEventListener('change', toggleReturneeUI);
+
+            // Initial state
+            toggleReturneeUI();
         }
+
+        // Modal controls
+        function openModal() {
+            modal.classList.remove('hidden');
+            searchInput.value = '';
+            resultsContainer.innerHTML = '<p class="text-gray-500 text-sm">Type at least 2 characters to search...</p>';
+            previewContainer.classList.add('hidden');
+            confirmBtn.classList.add('hidden');
+            selectedPatient = null;
+            searchInput.focus();
+        }
+
+        function closeModalFn() {
+            modal.classList.add('hidden');
+        }
+
+        // Event listeners for modal
+        document.addEventListener('click', function (e) {
+            if (e.target.id === 'searchReturneeBtn') openModal();
+            if (e.target.id === 'closeReturneeModal' || e.target.id === 'cancelReturneeSearch') closeModalFn();
+            if (e.target === modal) closeModalFn();
+        });
+
+        // Search functionality
+        searchInput.addEventListener('input', function () {
+            clearTimeout(searchTimeout);
+            const query = this.value.trim();
+
+            if (query.length < 2) {
+                resultsContainer.innerHTML = '<p class="text-gray-500 text-sm">Type at least 2 characters to search...</p>';
+                return;
+            }
+
+            searchTimeout = setTimeout(function () {
+                fetch(`/api/patients/search?query=${encodeURIComponent(query)}&exclude=${currentPatientId}`)
+                    .then(res => res.json())
+                    .then(patients => {
+                        if (patients.length === 0) {
+                            resultsContainer.innerHTML = '<p class="text-gray-500 text-sm">No patients found.</p>';
+                            return;
+                        }
+
+                        let html = '<div class="space-y-2">';
+                        patients.forEach(function (p) {
+                            html += `
+                                <div class="patient-result p-3 border rounded hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer" 
+                                     data-patient='${JSON.stringify(p).replace(/'/g, "&#39;")}'>
+                                    <div class="font-semibold">${p.fullName}</div>
+                                    <div class="text-sm text-gray-500">${p.phone || 'No phone'} | ${p.district || 'No district'}</div>
+                                    <div class="text-xs text-gray-400">Treatment: ${p.treatmentStartDate ? new Date(p.treatmentStartDate).toDateString() : 'N/A'}</div>
+                                </div>
+                            `;
+                        });
+                        html += '</div>';
+                        resultsContainer.innerHTML = html;
+
+                        // Add click listeners to results
+                        document.querySelectorAll('.patient-result').forEach(function (el) {
+                            el.addEventListener('click', function () {
+                                const patient = JSON.parse(this.dataset.patient);
+                                selectPatient(patient);
+                            });
+                        });
+                    })
+                    .catch(err => {
+                        console.error('Search error:', err);
+                        resultsContainer.innerHTML = '<p class="text-red-500">Error searching. Please try again.</p>';
+                    });
+            }, 300);
+        });
+
+        // Select a patient
+        function selectPatient(patient) {
+            selectedPatient = patient;
+
+            document.getElementById('selectedName').textContent = patient.fullName;
+            document.getElementById('selectedPhone').textContent = patient.phone || 'N/A';
+            document.getElementById('selectedDistrict').textContent = patient.district || 'N/A';
+            document.getElementById('selectedTreatmentDate').textContent =
+                patient.treatmentStartDate ? new Date(patient.treatmentStartDate).toDateString() : 'N/A';
+
+            previewContainer.classList.remove('hidden');
+            confirmBtn.classList.remove('hidden');
+
+            // Highlight selected result
+            document.querySelectorAll('.patient-result').forEach(function (el) {
+                el.classList.remove('bg-indigo-50', 'border-indigo-500');
+                const data = JSON.parse(el.dataset.patient);
+                if (data._id === patient._id) {
+                    el.classList.add('bg-indigo-50', 'border-indigo-500');
+                }
+            });
+        }
+
+        // Apply selected patient data to form
+        confirmBtn.addEventListener('click', function () {
+            if (!selectedPatient) return;
+
+            // const dateInput = document.getElementById('previousTreatmentDate');
+            // Fill previous treatment date with proper format
+            const dateInput = document.getElementById('previousTreatmentDate');
+            if (selectedPatient.treatmentStartDate) {
+                const date = new Date(selectedPatient.treatmentStartDate);
+                // Format as YYYY-MM-DD for input[type="date"]
+                const formattedDate = date.toISOString().split('T')[0];
+                dateInput.value = formattedDate;
+                console.log('Set previous treatment date to:', formattedDate);
+            }
+
+            // Only fill fields if they are empty (don't overwrite existing data)
+            const fullNameInput = document.getElementById('fullName');
+            const phoneInput = document.getElementById('phone');
+            const emailInput = document.getElementById('email');
+            const districtSelect = document.getElementById('district');
+            const ageInput = document.getElementById('age');
+            const genderSelect = document.getElementById('gender');
+
+            // Only auto-fill if field is empty
+            if (!fullNameInput.value || fullNameInput.value.trim() === '') {
+                fullNameInput.value = selectedPatient.fullName;
+                // Trigger validation feedback
+                fullNameInput.classList.add('border-green-500');
+                setTimeout(() => fullNameInput.classList.remove('border-green-500'), 2000);
+            }
+
+            if (!phoneInput.value && selectedPatient.phone) {
+                phoneInput.value = selectedPatient.phone;
+            }
+
+            if (!emailInput.value && selectedPatient.email) {
+                emailInput.value = selectedPatient.email;
+            }
+
+            if (selectedPatient.district && districtSelect) {
+                if (!districtSelect.value) {
+                    const option = districtSelect.querySelector(`option[value="${selectedPatient.district}"]`);
+                    if (option) option.selected = true;
+                }
+            }
+
+            // Close modal
+            closeModalFn();
+
+            // Show success feedback with more detail
+            const alert = document.createElement('div');
+            alert.className = 'bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4 flex items-start';
+            alert.innerHTML = `
+        <span class="mr-2">✅</span>
+        <div>
+            <strong>Previous patient data loaded!</strong><br>
+            <span class="text-sm">Patient: ${selectedPatient.fullName}</span><br>
+            <span class="text-sm">Treatment date: ${selectedPatient.treatmentStartDate ? new Date(selectedPatient.treatmentStartDate).toDateString() : 'N/A'}</span>
+        </div>
+    `;
+
+            // Remove any existing alerts first
+            const existingAlerts = document.querySelector('.bg-green-100.border-green-400');
+            if (existingAlerts) existingAlerts.remove();
+
+            document.querySelector('form').prepend(alert);
+
+            // Auto-dismiss after 5 seconds
+            setTimeout(() => {
+                if (alert.parentNode) alert.remove();
+            }, 5000);
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
+                closeModalFn();
+            }
+        });
     });
 </script>

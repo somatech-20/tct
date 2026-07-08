@@ -402,16 +402,6 @@ exports.exportOne = async (req, res) => {
   }
 };
 
-// exports.list = async (req, res) => {
-//   try {
-//     const patients = await Patient.find().sort('-createdAt');
-//     res.render('patients/list', { patients });
-//   } catch (err) {
-//     console.error(err);
-//     res.status(500).send('Server Error');
-//   }
-// };
-
 // List - populate assignedDoctor and registeredBy
 exports.list = async (req, res) => {
   try {
@@ -462,31 +452,18 @@ exports.detail = async (req, res) => {
       .populate('assignedDoctor', 'username fullName')
       .populate('registeredBy', 'username fullName')
       .populate('createdBy', 'username fullName');
-      
+
     if (!patient) return res.status(404).send('Patient not found');
-    
+
     const treatments = await TreatmentLog.find({ patient: patient._id }).sort('-date');
     const contacts = await Contact.find({ patient: patient._id });
-    
+
     res.render('patients/detail', { patient, treatments, contacts });
   } catch (err) {
     console.error(err);
     res.status(500).send('Server Error');
   }
 };
-
-// exports.detail = async (req, res) => {
-//   try {
-//     const patient = await Patient.findById(req.params.id);
-//     if (!patient) return res.status(404).send('Patient not found');
-//     const treatments = await TreatmentLog.find({ patient: patient._id }).sort('-date');
-//     const contacts = await Contact.find({ patient: patient._id });
-//     res.render('patients/detail', { patient, treatments, contacts });
-//   } catch (err) {
-//     console.error(err);
-//     res.status(500).send('Server Error');
-//   }
-// };
 
 exports.newForm = async (req, res) => {
   try {
@@ -502,70 +479,116 @@ exports.newForm = async (req, res) => {
   }
 };
 
-// exports.create = async (req, res) => {
-//   try {
-//     if (req.session.userRole !== 'doctor' && req.session.userRole !== 'receptionist') {
-//       return res.status(403).send('Access denied. Only doctors and receptionists can register patients.');
-//     }
-//     const patientData = { ...req.body, createdBy: req.session.userId, registeredBy: req.session.userId };
-//     const patient = new Patient(patientData);
-//     await patient.save();
-//     res.redirect(`/patients/${patient._id}`);
-//   } catch (err) {
-//     console.error(err);
-//     res.status(500).send('Server Error');
-//   }
-// };
-
-// exports.update = async (req, res) => {
-//   try {
-//     // Allow receptionists to update patient info, and doctors can update treatment info
-//     // For now, we'll allow both roles to update basic patient data
-//     const patient = await Patient.findByIdAndUpdate(req.params.id, req.body, { new: true });
-//     if (!patient) return res.status(404).send('Patient not found');
-//     res.redirect(`/patients/${patient._id}`);
-//   } catch (err) {
-//     console.error(err);
-//     res.status(500).send('Server Error');
-//   }
-// };
-
 exports.create = async (req, res) => {
   try {
-    // Only receptionists can create patients
+    // Only receptionists and doctors can create patients
     if (req.session.userRole !== 'receptionist' && req.session.userRole !== 'doctor') {
       return res.status(403).send('Only receptionists and doctors can register patients.');
     }
 
-    // Extract emergency contact from form data
+    // Prepare patient data with proper handling of all fields
     const patientData = {
-      ...req.body,
+      fullName: req.body.fullName,
+      age: req.body.age,
+      gender: req.body.gender,
+      maritalStatus: req.body.maritalStatus || undefined,
+      district: req.body.district,
+      tbType: req.body.tbType,
+      treatmentStartDate: req.body.treatmentStartDate,
+      status: req.body.status || 'Active',
+      email: req.body.email || undefined,
+      phone: req.body.phone || undefined,
+      // isReturnee: req.body.isReturnee === 'true' || req.body.isReturnee === true,
+      isReturnee: req.body.isReturnee === 'on' || req.body.isReturnee === true || req.body.isReturnee === 'true',
+      // Only set previousTreatmentDate if isReturnee is true
+      previousTreatmentDate: (req.body.isReturnee === 'true' || req.body.isReturnee === true)
+        ? req.body.previousTreatmentDate
+        : undefined,
+      // Handle assignedDoctor - if empty string or 'unassigned', set to undefined
+      assignedDoctor: (req.body.assignedDoctor && req.body.assignedDoctor !== '' && req.body.assignedDoctor !== 'unassigned')
+        ? req.body.assignedDoctor
+        : undefined,
       registeredBy: req.session.userId,
       createdBy: req.session.userId,
-      // Ensure emergencyContact is properly structured
-      emergencyContact: {
-        name: req.body.emergencyContact?.name || '',
-        relationship: req.body.emergencyContact?.relationship || '',
-        phone: req.body.emergencyContact?.phone || ''
-      }
+      // Emergency contact - only if at least one field has value
+      emergencyContact: {}
     };
 
-    // Remove any empty emergency contact fields
-    if (!patientData.emergencyContact.name && 
-        !patientData.emergencyContact.relationship && 
-        !patientData.emergencyContact.phone) {
+    // Only set emergencyContact if at least one field has a value
+    if (req.body.emergencyContact?.name || req.body.emergencyContact?.relationship || req.body.emergencyContact?.phone) {
+      patientData.emergencyContact = {
+        name: req.body.emergencyContact.name || '',
+        relationship: req.body.emergencyContact.relationship || '',
+        phone: req.body.emergencyContact.phone || ''
+      };
+    } else {
       patientData.emergencyContact = undefined;
     }
+
+    // Remove undefined values to avoid validation issues
+    Object.keys(patientData).forEach(key => {
+      if (patientData[key] === undefined || patientData[key] === null) {
+        delete patientData[key];
+      }
+    });
 
     const patient = new Patient(patientData);
     await patient.save();
     res.redirect(`/patients/${patient._id}`);
   } catch (err) {
-    console.error(err);
+    console.error('Create error:', err);
+
     // Handle duplicate key error
     if (err.code === 11000) {
-      return res.status(400).send('A patient with this name already exists. Please use a different name.');
+      const doctors = await User.find({ role: 'doctor' }).select('username fullName');
+      return res.status(400).render('patients/form', {
+        patient: req.body,
+        doctors: doctors,
+        errors: [{ msg: 'A patient with this name already exists. Please use a different name.' }],
+        action: '/patients'
+      });
     }
+
+    // Handle validation errors
+    if (err.name === 'ValidationError') {
+      const errors = Object.values(err.errors).map(e => ({ msg: e.message }));
+      const doctors = await User.find({ role: 'doctor' }).select('username fullName');
+      return res.status(400).render('patients/form', {
+        patient: req.body,
+        doctors: doctors,
+        errors: errors,
+        action: '/patients'
+      });
+    }
+
+    const patient = new Patient(patientData);
+    await patient.save();
+
+    // Auto-create first treatment log for new patient
+    const TreatmentLog = require('../models/TreatmentLog');
+    await TreatmentLog.create({
+      patient: patient._id,
+      date: new Date(),
+      doseTaken: false,
+      sputumResult: 'Pending',
+      notes: 'Auto-created on patient registration'
+    });
+
+    // If a doctor was assigned, create notification
+    if (patient.assignedDoctor) {
+      const Notification = require('../models/Notification');
+      await Notification.create({
+        user: patient.assignedDoctor,
+        type: 'PATIENT_ASSIGNED',
+        title: 'New Patient Assigned',
+        message: `You have been assigned to ${patient.fullName} (${patient.patientId}). Please review their case.`,
+        link: `/patients/${patient._id}`,
+        relatedPatient: patient._id
+      });
+    }
+
+    res.redirect(`/patients/${patient._id}`);
+
     res.status(500).send('Server Error');
   }
 };
@@ -587,41 +610,52 @@ exports.update = async (req, res) => {
       tbType: req.body.tbType,
       treatmentStartDate: req.body.treatmentStartDate,
       status: req.body.status || 'Active',
-      isReturnee: req.body.isReturnee === 'true' || req.body.isReturnee === true,
-      previousTreatmentDate: req.body.previousTreatmentDate || undefined,
       email: req.body.email || undefined,
       phone: req.body.phone || undefined,
-      // assignedDoctor - handle empty string
-      assignedDoctor: req.body.assignedDoctor && req.body.assignedDoctor !== '' ? req.body.assignedDoctor : undefined,
-      emergencyContact: {
-        name: req.body.emergencyContact?.name || '',
-        relationship: req.body.emergencyContact?.relationship || '',
-        phone: req.body.emergencyContact?.phone || ''
-      }
+      // isReturnee: req.body.isReturnee === 'true' || req.body.isReturnee === true,
+      isReturnee: req.body.isReturnee === 'on' || req.body.isReturnee === true || req.body.isReturnee === 'true',
+      // Only set previousTreatmentDate if isReturnee is true
+      previousTreatmentDate: (req.body.isReturnee === 'true' || req.body.isReturnee === true)
+        ? req.body.previousTreatmentDate
+        : undefined,
+      // Handle assignedDoctor - if empty string or 'unassigned', set to undefined
+      assignedDoctor: (req.body.assignedDoctor && req.body.assignedDoctor !== '' && req.body.assignedDoctor !== 'unassigned')
+        ? req.body.assignedDoctor
+        : undefined,
+      // Emergency contact
+      emergencyContact: {}
     };
 
-    // Remove empty emergency contact
-    if (!updateData.emergencyContact.name && 
-        !updateData.emergencyContact.relationship && 
-        !updateData.emergencyContact.phone) {
+    // Only set emergencyContact if at least one field has a value
+    if (req.body.emergencyContact?.name || req.body.emergencyContact?.relationship || req.body.emergencyContact?.phone) {
+      updateData.emergencyContact = {
+        name: req.body.emergencyContact.name || '',
+        relationship: req.body.emergencyContact.relationship || '',
+        phone: req.body.emergencyContact.phone || ''
+      };
+    } else {
       updateData.emergencyContact = undefined;
     }
 
-    // Remove _id from update data if present
-    delete updateData._id;
+    // Remove undefined values
+    Object.keys(updateData).forEach(key => {
+      if (updateData[key] === undefined || updateData[key] === null) {
+        delete updateData[key];
+      }
+    });
 
     const patient = await Patient.findByIdAndUpdate(
-      req.params.id, 
-      updateData, 
+      req.params.id,
+      updateData,
       { new: true, runValidators: true }
     );
-    
+
     if (!patient) return res.status(404).send('Patient not found');
-    
     res.redirect(`/patients/${patient._id}`);
   } catch (err) {
     console.error('Update error:', err);
-    
+
+    // Handle validation errors
     if (err.name === 'ValidationError') {
       const errors = Object.values(err.errors).map(e => ({ msg: e.message }));
       const doctors = await User.find({ role: 'doctor' }).select('username fullName');
@@ -632,7 +666,7 @@ exports.update = async (req, res) => {
         action: `/patients/${req.params.id}?_method=PUT`
       });
     }
-    
+
     if (err.code === 11000) {
       const doctors = await User.find({ role: 'doctor' }).select('username fullName');
       return res.status(400).render('patients/form', {
@@ -642,7 +676,50 @@ exports.update = async (req, res) => {
         action: `/patients/${req.params.id}?_method=PUT`
       });
     }
-    
+
+    // Check if a doctor is being assigned
+    const previousPatient = await Patient.findById(req.params.id);
+    const isNewAssignment = req.body.assignedDoctor &&
+      req.body.assignedDoctor !== '' &&
+      req.body.assignedDoctor !== 'unassigned' &&
+      (!previousPatient.assignedDoctor ||
+        previousPatient.assignedDoctor.toString() !== req.body.assignedDoctor);
+
+    const patient = await Patient.findByIdAndUpdate(
+      req.params.id,
+      updateData,
+      { new: true, runValidators: true }
+    );
+
+    // If a new doctor was assigned, create a notification and treatment log
+    if (isNewAssignment && patient) {
+      const Notification = require('../models/Notification');
+      await Notification.create({
+        user: patient.assignedDoctor,
+        type: 'PATIENT_ASSIGNED',
+        title: 'Patient Assigned to You',
+        message: `${patient.fullName} (${patient.patientId}) has been assigned to your care.`,
+        link: `/patients/${patient._id}`,
+        relatedPatient: patient._id
+      });
+
+
+      // Auto-create first treatment log for today
+      const TreatmentLog = require('../models/TreatmentLog');
+      await TreatmentLog.create({
+        patient: patient._id,
+        date: new Date(),
+        doseTaken: false,
+        sputumResult: 'Pending',
+        notes: 'Auto-created on assignment to doctor'
+      });
+
+      console.log(`✅ Doctor assigned: ${patient.fullName} -> ${patient.assignedDoctor}`);
+    }
+
+    if (!patient) return res.status(404).send('Patient not found');
+    res.redirect(`/patients/${patient._id}`);
+
     res.status(500).send('Server Error');
   }
 };
@@ -652,8 +729,8 @@ exports.editForm = async (req, res) => {
     const patient = await Patient.findById(req.params.id).populate('assignedDoctor');
     if (!patient) return res.status(404).send('Patient not found');
     const doctors = await User.find({ role: 'doctor' }).select('username fullName');
-    res.render('patients/form', { 
-      patient, 
+    res.render('patients/form', {
+      patient,
       doctors,
       action: `/patients/${patient._id}?_method=PUT`
     });
