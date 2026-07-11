@@ -70,10 +70,35 @@ exports.index = async (req, res) => {
 
 // Export with filters (POST)
 exports.export = async (req, res) => {
-    try {
-        const { format, startDate, endDate, doctor, status, district, returnee, search } = req.body;
+//     try {
+//         const { format, startDate, endDate, doctor, status, district, returnee, search } = req.body;
 
-        // Build filter (same as above)
+//         // Build filter (same as above)
+//         const filter = {};
+//         if (status && status !== '') filter.status = status;
+//         if (district && district !== '') filter.district = district;
+//         if (doctor && doctor !== '') filter.assignedDoctor = doctor;
+//         if (returnee !== undefined && returnee !== '') filter.isReturnee = returnee === 'true';
+//         if (search && search !== '') {
+//             filter.$or = [
+//                 { fullName: { $regex: search, $options: 'i' } },
+//                 { patientId: { $regex: search, $options: 'i' } },
+//                 { phone: { $regex: search, $options: 'i' } }
+//             ];
+//         }
+//         if (startDate || endDate) {
+//             filter.createdAt = {};
+//             if (startDate) filter.createdAt.$gte = new Date(startDate);
+//             if (endDate) filter.createdAt.$lte = new Date(endDate);
+//         }
+
+//         const patients = await Patient.find(filter)
+//             .populate('assignedDoctor', 'fullName username')
+//             .populate('registeredBy', 'fullName username');
+    try {
+        const { format, startDate, endDate, dateField, doctor, status, district, returnee, search } = req.body;
+        
+        // Build filter
         const filter = {};
         if (status && status !== '') filter.status = status;
         if (district && district !== '') filter.district = district;
@@ -86,10 +111,13 @@ exports.export = async (req, res) => {
                 { phone: { $regex: search, $options: 'i' } }
             ];
         }
+
+        // Date range filter
         if (startDate || endDate) {
-            filter.createdAt = {};
-            if (startDate) filter.createdAt.$gte = new Date(startDate);
-            if (endDate) filter.createdAt.$lte = new Date(endDate);
+            const field = dateField === 'treatmentStartDate' ? 'treatmentStartDate' : 'createdAt';
+            filter[field] = {};
+            if (startDate) filter[field].$gte = new Date(startDate);
+            if (endDate) filter[field].$lte = new Date(endDate);
         }
 
         const patients = await Patient.find(filter)

@@ -1,30 +1,38 @@
 <div class="max-w-full px-4 md:px-6">
-    <!-- Stats Cards with Gradients -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-6 md:mb-8">
-        <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg shadow-lg p-4 md:p-6 text-white">
-            <p class="text-sm opacity-80">Total Patients</p>
-            <p class="text-2xl md:text-3xl font-bold">
+
+        <!-- Total -->
+        <div class="rounded-xl bg-gradient-to-br from-slate-700 to-slate-900 shadow-lg p-6 text-white">
+            <p class="text-sm text-slate-300">Total Patients</p>
+            <p class="mt-2 text-3xl font-bold">
                 <%= stats.total %>
             </p>
         </div>
-        <div class="bg-gradient-to-br from-green-500 to-green-600 rounded-lg shadow-lg p-4 md:p-6 text-white">
-            <p class="text-sm opacity-80">Active</p>
-            <p class="text-2xl md:text-3xl font-bold">
+
+        <!-- Active -->
+        <div class="rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-700 shadow-lg p-6 text-white">
+            <p class="text-sm text-emerald-100">Active</p>
+            <p class="mt-2 text-3xl font-bold">
                 <%= stats.active %>
             </p>
         </div>
-        <div class="bg-gradient-to-br from-blue-400 to-blue-500 rounded-lg shadow-lg p-4 md:p-6 text-white">
-            <p class="text-sm opacity-80">Recovered</p>
-            <p class="text-2xl md:text-3xl font-bold">
+
+        <!-- Recovered -->
+        <div class="rounded-xl bg-gradient-to-br from-sky-500 to-cyan-600 shadow-lg p-6 text-white">
+            <p class="text-sm text-sky-100">Recovered</p>
+            <p class="mt-2 text-3xl font-bold">
                 <%= stats.recovered %>
             </p>
         </div>
-        <div class="bg-gradient-to-br from-red-500 to-red-600 rounded-lg shadow-lg p-4 md:p-6 text-white">
-            <p class="text-sm opacity-80">Defaulted</p>
-            <p class="text-2xl md:text-3xl font-bold">
+
+        <!-- Defaulted -->
+        <div class="rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 shadow-lg p-6 text-white">
+            <p class="text-sm text-amber-100">Defaulted</p>
+            <p class="mt-2 text-3xl font-bold">
                 <%= stats.defaulted %>
             </p>
         </div>
+
     </div>
 
     <!-- Filters Section -->
@@ -232,15 +240,18 @@
 
 <!-- Export Modal -->
 <div id="exportModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 hidden">
-    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white dark:bg-gray-800">
-        <div class="flex justify-between items-center mb-4">
+    <div class="relative top-10 mx-auto p-5 border w-11/12 max-w-2xl shadow-lg rounded-md bg-white dark:bg-gray-800">
+        <div class="flex justify-between items-center border-b pb-3 mb-4">
             <h3 class="text-lg font-bold">Export Report</h3>
             <button id="closeExportModal" class="text-gray-400 hover:text-gray-600">&times;</button>
         </div>
 
         <form id="exportForm" method="POST" action="/reports/export" target="_blank" class="no-loader">
+            <!-- Format Selection -->
             <div class="mb-4">
-                <label class="block text-gray-700 text-sm font-bold mb-2">Select Format</label>
+                <label class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2">
+                    <h4 class="text-sm font-semibold uppercase tracking-wide text-gray-500 mb-3">Select Format</h4>
+                </label>
                 <div class="grid grid-cols-3 gap-2">
                     <button type="button" data-format="pdf"
                         class="format-btn px-4 py-2 border rounded hover:bg-indigo-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
@@ -269,83 +280,383 @@
                         <span class="text-sm mt-1">CSV</span>
                     </button>
                 </div>
-                <input type="hidden" name="format" id="selectedFormat" value="pdf">
+                <input type="hidden" name="format" id="selectedFormat"
+                    class="bg-indigo-50 border-indigo-600 ring-2 ring-indigo-500" value="pdf">
+            </div>
+
+            <!-- Date Field Toggle -->
+            <div class="mb-6">
+                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+                    <h4 class="text-sm font-semibold uppercase tracking-wide text-gray-500 mb-3">Date Range Based On
+                    </h4>
+                </label>
+
+                <div class="grid grid-cols-2 gap-3">
+
+                    <label
+                        class="cursor-pointer rounded-xl border border-gray-300 dark:border-gray-600 p-3 flex items-center justify-center transition-all hover:border-indigo-500 has-[:checked]:bg-indigo-600 has-[:checked]:text-white has-[:checked]:border-indigo-600">
+
+                        <input type="radio" name="dateField" value="treatmentStartDate" checked class="hidden">
+
+                        <span class="font-medium">
+                            Treatment Start Date
+                        </span>
+
+                    </label>
+
+                    <label
+                        class="cursor-pointer rounded-xl border border-gray-300 dark:border-gray-600 p-3 flex items-center justify-center transition-all hover:border-indigo-500 has-[:checked]:bg-indigo-600 has-[:checked]:text-white has-[:checked]:border-indigo-600">
+
+                        <input type="radio" name="dateField" value="createdAt" class="hidden">
+
+                        <span class="font-medium">
+                            Created Date
+                        </span>
+
+                    </label>
+
+                </div>
+            </div>
+
+            <!-- Quick Select: Years & Months -->
+            <div class=" rounded-2xl border border-gray-700 bg-gradient-to-b from-gray-800 to-gray-900 p-5 shadow-inner space-y-5 "
+                <label class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2">
+                <h4 class="text-sm font-semibold uppercase tracking-wide text-gray-500 mb-3">Quick Select</h4></label>
+                <div id="yearAccordion"
+                    class=" max-h-64 overflow-y-auto rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 p-3 space-y-3 ">
+                    <!-- Years will be populated by JavaScript -->
+                </div>
+                <p class="text-xs text-gray-500 mt-1">Double-click a year to select entire year, click a year to expand, click a month to select.</p>
+            </div>
+
+            <!-- Custom Range -->
+            <div class="mb-4 grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-1">Start Date</label>
+                    <input type="date" name="startDate" id="customStartDate"
+                        class=" w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 px-4 py-3 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 transition ">
+                </div>
+                <div>
+                    <label class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-1">End Date</label>
+                    <input type="date" name="endDate" id="customEndDate"
+                        class=" w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 px-4 py-3 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 transition ">
+                </div>
             </div>
 
             <!-- Hidden fields to pass current filters -->
-            <input type="hidden" name="startDate" value="<%= filters.startDate || '' %>">
-            <input type="hidden" name="endDate" value="<%= filters.endDate || '' %>">
             <input type="hidden" name="doctor" value="<%= filters.doctor || '' %>">
             <input type="hidden" name="status" value="<%= filters.status || '' %>">
             <input type="hidden" name="district" value="<%= filters.district || '' %>">
             <input type="hidden" name="returnee" value="<%= filters.returnee || '' %>">
             <input type="hidden" name="search" value="<%= filters.search || '' %>">
-            <!-- <input type="hidden" name="returnee" value="<%= filters.returnee || '' %>"> -->
 
             <div class="mt-4 flex justify-end space-x-2">
                 <button type="button" id="cancelExport"
-                    class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded">Cancel</button>
+                    class="bg-gray-500 hover:bg-gray-600 text-gray-800 rounded-xl px-5 py-2.5">Cancel</button>
                 <button type="submit" id="confirmExport"
-                    class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded" disabled>Export</button>
+                    class="bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl px-6 py-2.5 shadow-lg hover:shadow-xl transition"
+                    disabled>Export</button>
             </div>
         </form>
     </div>
 </div>
 
 <script nonce="<%= nonce %>">
-    document.addEventListener('DOMContentLoaded', function () {
-        // ===== EXPORT MODAL =====
-        const exportBtn = document.getElementById('exportBtn');
-        const modal = document.getElementById('exportModal');
-        const closeModal = document.getElementById('closeExportModal');
-        const cancelExport = document.getElementById('cancelExport');
-        const confirmBtn = document.getElementById('confirmExport');
-        const formatInput = document.getElementById('selectedFormat');
+    document.addEventListener("DOMContentLoaded", () => {
 
-        // Open modal
-        exportBtn.addEventListener('click', function () {
-            modal.classList.remove('hidden');
-            // Reset selection
-            document.querySelectorAll('.format-btn').forEach(btn => {
-                btn.classList.remove('bg-indigo-100', 'border-indigo-500');
-            });
-            confirmBtn.disabled = true;
-        });
+        // ==========================
+        // Elements
+        // ==========================
+        const exportBtn = document.getElementById("exportBtn");
+        const exportModal = document.getElementById("exportModal");
+        const exportForm = document.getElementById("exportForm");
 
-        // Close modal
-        function closeModalFn() {
-            modal.classList.add('hidden');
+        const closeBtn = document.getElementById("closeExportModal");
+        const cancelBtn = document.getElementById("cancelExport");
+
+        const confirmBtn = document.getElementById("confirmExport");
+        const formatInput = document.getElementById("selectedFormat");
+
+        const startInput = document.getElementById("customStartDate");
+        const endInput = document.getElementById("customEndDate");
+
+        const accordion = document.getElementById("yearAccordion");
+
+        let selectedMonthBtn = null;
+
+        // ==========================
+        // Build Year Accordion Once
+        // ==========================
+        function buildYearAccordion() {
+
+            const currentYear = new Date().getFullYear();
+            const startYear = 2020;
+
+            const months = [
+                "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+            ];
+
+            accordion.innerHTML = "";
+
+            for (let year = currentYear; year >= startYear; year--) {
+
+                const wrapper = document.createElement("div");
+                wrapper.className = "mb-2";
+
+                wrapper.innerHTML = `
+                <div class="year-toggle cursor-pointer rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 hover:border-indigo-500 hover:shadow transition flex justify-between items-center px-4 py-3"
+                    data-year="${year}">
+                    <div class="flex items-center gap-3">
+                        <div
+                            class="w-10 h-10 rounded-lg bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center">
+                                📅
+                        </div>
+                        <span class="font-semibold text-gray-700 dark:text-gray-200">
+                            ${year}
+                        </span>
+                    </div>
+                    <span class="arrow text-gray-400">
+                        ▼
+                    </span>
+                </div>
+
+                <div class=" month-grid hidden grid grid-cols-4 gap-2 mt-3 mb-4 px-1 ">
+
+                    ${months.map((m, index) => `
+                        <button
+                            type="button"
+                            class=" month-btn rounded-lg border border-gray-300 dark:border-gray-600 py-2 text-sm font-medium transition hover:border-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-900 "
+                            data-year="${year}"
+                            data-month="${index + 1}">
+                            ${m}
+                        </button>
+                    `).join("")}
+
+                </div>
+            `;
+
+                accordion.appendChild(wrapper);
+            }
+
+            bindAccordionEvents();
         }
-        closeModal.addEventListener('click', closeModalFn);
-        cancelExport.addEventListener('click', closeModalFn);
-        window.addEventListener('click', function (e) {
-            if (e.target === modal) closeModalFn();
-        });
 
-        // Format selection
-        document.querySelectorAll('.format-btn').forEach(btn => {
-            btn.addEventListener('click', function () {
-                document.querySelectorAll('.format-btn').forEach(b => {
-                    b.classList.remove('bg-indigo-100', 'border-indigo-500');
+        // ==========================
+        // Accordion Events
+        // ==========================
+        function bindAccordionEvents() {
+
+            // Expand / Collapse
+            accordion.querySelectorAll(".year-toggle").forEach(toggle => {
+
+                toggle.addEventListener("click", function () {
+
+                    const grid = this.nextElementSibling;
+
+                    grid.classList.toggle("hidden");
+
+                    this.lastElementChild.textContent =
+                        grid.classList.contains("hidden") ? "▼" : "▲";
                 });
-                this.classList.add('bg-indigo-100', 'border-indigo-500');
-                formatInput.value = this.dataset.format;
-                confirmBtn.disabled = false;
+
+                // Double click = whole year
+                toggle.addEventListener("dblclick", function () {
+                    clearSelections();
+                    const year = parseInt(this.dataset.year);
+
+                    startInput.value = `${year}-01-01`;
+                    endInput.value = `${year}-12-31`;
+
+                    this.classList.add(
+                        "border-indigo-600",
+                        "ring-2",
+                        "ring-indigo-300"
+                    );
+
+                });
+
             });
+
+            // Month click
+            accordion.querySelectorAll(".month-btn").forEach(btn => {
+                btn.addEventListener("click", function () {
+
+                    // Clicking the currently selected month -> deselect it
+                    if (selectedMonthBtn === this) {
+
+                        this.classList.remove(
+                            "bg-indigo-600",
+                            "text-white",
+                            "border-indigo-600"
+                        );
+
+                        selectedMonthBtn = null;
+
+                        startInput.value = "";
+                        endInput.value = "";
+
+                        return;
+                    }
+
+                    // Deselect previously selected month
+                    if (selectedMonthBtn) {
+                        selectedMonthBtn.classList.remove(
+                            "bg-indigo-600",
+                            "text-white",
+                            "border-indigo-600"
+                        );
+                    }
+
+                    // Select the clicked month
+                    selectedMonthBtn = this;
+
+                    this.classList.add(
+                        "bg-indigo-600",
+                        "text-white",
+                        "border-indigo-600"
+                    );
+
+                    const year = Number(this.dataset.year);
+                    const month = Number(this.dataset.month);
+
+                    const first = new Date(year, month - 1, 1);
+                    const last = new Date(year, month, 0);
+
+                    startInput.value = formatDate(first);
+                    endInput.value = formatDate(last);
+                });
+
+            });
+        }
+
+        // ==========================
+        // Helpers
+        // ==========================
+        function formatDate(date) {
+            const y = date.getFullYear();
+            const m = String(date.getMonth() + 1).padStart(2, "0");
+            const d = String(date.getDate()).padStart(2, "0");
+
+            return `${y}-${m}-${d}`;
+
+        }
+
+        function clearSelections() {
+            accordion.querySelectorAll(".year-toggle")
+                .forEach(el => {
+                    el.classList.remove(
+                        "border-indigo-600",
+                        "ring-2",
+                        "ring-indigo-300"
+                    );
+                });
+
+            accordion.querySelectorAll(".month-btn")
+                .forEach(el => {
+                    el.classList.remove(
+                        "bg-indigo-200",
+                        "dark:bg-indigo-800"
+                    );
+                });
+
+            selectedMonthBtn = null;
+
+            startInput.value = "";
+            endInput.value = "";
+        }
+
+        // ==========================
+        // Reset Modal
+        // ==========================
+        function resetModal() {
+            exportForm.reset();
+            clearSelections();
+            document.querySelectorAll(".format-btn")
+                .forEach(btn => {
+                    btn.classList.remove(
+                        "bg-indigo-600",
+                        "text-white",
+                        "border-indigo-600"
+                    );
+                });
+
+            // Default format
+            formatInput.value = "pdf";
+            const defaultBtn = document.querySelector(
+                '.format-btn[data-format="pdf"]'
+            );
+            defaultBtn.classList.add(
+                "bg-indigo-100",
+                "border-indigo-500"
+            );
+            confirmBtn.disabled = false;
+            confirmBtn.textContent = "Export";
+        }
+
+        // ==========================
+        // Open / Close
+        // ==========================
+        function openModal() {
+            resetModal();
+            exportModal.classList.remove("hidden");
+        }
+
+        function closeModal() {
+            resetModal();
+            exportModal.classList.add("hidden");
+        }
+
+        exportBtn.addEventListener("click", openModal);
+        closeBtn.addEventListener("click", closeModal);
+        cancelBtn.addEventListener("click", closeModal);
+        window.addEventListener("click", (e) => {
+
+            if (e.target === exportModal) {
+                closeModal();
+            }
         });
 
-        // Submit export form
-        document.getElementById('exportForm').addEventListener('submit', function (e) {
-            // Show loading state
+        // ==========================
+        // Format Selection
+        // ==========================
+        document.querySelectorAll(".format-btn")
+            .forEach(btn => {
+                btn.addEventListener("click", function () {
+                    document.querySelectorAll(".format-btn")
+                        .forEach(b => b.classList.remove(
+                            "bg-indigo-100",
+                            "border-indigo-500"
+                        ));
+                    this.classList.add(
+                        "bg-indigo-100",
+                        "border-indigo-500"
+                    );
+                    formatInput.value = this.dataset.format;
+                });
+            });
+
+        // ==========================
+        // Form Submit
+        // ==========================
+        exportForm.addEventListener("submit", (e) => {
+            if (!startInput.value || !endInput.value) {
+                e.preventDefault();
+                alert("Please select a date range.");
+                return;
+            }
             confirmBtn.disabled = true;
-            confirmBtn.textContent = 'Exporting...';
+            confirmBtn.textContent = "Exporting...";
 
-            // The form will submit normally and open in new tab
-            setTimeout(() => {
-                closeModalFn();
-                confirmBtn.disabled = false;
-                confirmBtn.textContent = 'Export';
-            }, 2000);
+            // Let the browser submit normally.
+            // No timeout needed.
+            closeModal();
         });
+
+        // ==========================
+        // Initialize
+        // ==========================
+        buildYearAccordion();
+
     });
 </script>
