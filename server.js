@@ -102,7 +102,7 @@ app.use(i18n.init);
 //   next();
 // });
 
-// In server.js - find this middleware and update it
+// Middleware to set locale, user info, theme, and current path for all views
 app.use((req, res, next) => {
   // Language from query or session
   if (req.query.lang) {
@@ -111,23 +111,30 @@ app.use((req, res, next) => {
   } else if (req.session.lang) {
     res.setLocale(req.session.lang);
   }
-  
+
   // Expose helpers to all views
   res.locals.t = req.__;
   res.locals.locale = req.getLocale();
   res.locals.theme = req.session.theme || 'system';
-  
+
   // CRITICAL: Always set user, even if null
   res.locals.user = req.session.userId
     ? {
-        id: req.session.userId,
-        role: req.session.userRole,
-        username: req.session.username,
-        preferredExportFormat: req.session.preferredExportFormat || 'pdf'
-      }
+      id: req.session.userId,
+      role: req.session.userRole,
+      username: req.session.username,
+      preferredExportFormat: req.session.preferredExportFormat || 'pdf'
+    }
     : null;  // Explicitly null when not logged in
-  
+
   res.locals.currentPath = req.path;
+  // console.log({
+  //   sessionID: req.sessionID,
+  //   userId: req.session.userId,
+  //   userRole: req.session.userRole,
+  //   path: req.path
+  // });
+
   next();
 });
 
@@ -247,11 +254,11 @@ app.post('/api/settings/email', async (req, res) => {
 app.get('/api/patients/search', async (req, res) => {
   try {
     const { query, exclude } = req.query;
-    
+
     if (!query || query.length < 2) {
       return res.json([]);
     }
-    
+
     // Only show patients who are NOT active (recovered or defaulted)
     // These are patients who have completed their treatment
     const patients = await Patient.find({
@@ -268,9 +275,9 @@ app.get('/api/patients/search', async (req, res) => {
         { _id: { $ne: exclude || null } } // Exclude current patient
       ]
     })
-    .limit(10)
-    .select('fullName phone email district treatmentStartDate gender age patientId status');
-    
+      .limit(10)
+      .select('fullName phone email district treatmentStartDate gender age patientId status');
+
     res.json(patients);
   } catch (err) {
     console.error(err);

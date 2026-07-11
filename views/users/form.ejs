@@ -1,18 +1,26 @@
 <div class="bg-white shadow rounded-lg p-6 max-w-md mx-auto">
     <h2 class="text-xl font-bold mb-6">
-        <%= user ? 'Edit User' : 'Add User' %>
+        <%= formUser ? 'Edit User' : 'Add User' %>
     </h2>
     <% if (error) { %>
         <div class="bg-red-100 text-red-700 p-2 rounded mb-4">
             <%= error %>
         </div>
         <% } %>
-            <form method="POST" action="/users<%= user ? '/'+user._id+'?_method=PUT' : '' %>">
+            <form method="POST" action="/users<%= formUser ? '/'+formUser._id+'?_method=PUT' : '' %>">
                 <div class="mb-4">
                     <label class="block text-gray-700 text-sm font-bold mb-2">
                         <%= t('full_name') %>
                     </label>
-                    <input type="text" name="fullName" value="<%= user ? user.fullName : '' %>"
+                    <input type="text" name="fullName" value="<%= formUser ? formUser.fullName : '' %>"
+                        class="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        required>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">
+                        <%= t('email') %>
+                    </label>
+                    <input type="email" name="email" value="<%= formUser ? formUser.email : '' %>"
                         class="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-indigo-500"
                         required>
                 </div>
@@ -20,7 +28,7 @@
                     <label class="block text-gray-700 text-sm font-bold mb-2">
                         <%= t('username') %>
                     </label>
-                    <input type="text" name="username" value="<%= user ? user.username : '' %>"
+                    <input type="text" name="username" value="<%= formUser ? formUser.username : '' %>"
                         class="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-indigo-500"
                         required>
                 </div>
@@ -31,20 +39,20 @@
                     <select name="role"
                         class="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-indigo-500"
                         required>
-                        <option value="admin" <%=user && user.role==='admin' ? 'selected' : '' %>>Admin</option>
-                        <option value="doctor" <%=user && user.role==='doctor' ? 'selected' : '' %>>Doctor/Nurse
+                        <option value="admin" <%=formUser && formUser.role==='admin' ? 'selected' : '' %>>Admin</option>
+                        <option value="doctor" <%=formUser && formUser.role==='doctor' ? 'selected' : '' %>>Doctor/Nurse
                         </option>
-                        <option value="receptionist" <%=user && user.role==='receptionist' ? 'selected' : '' %>
+                        <option value="receptionist" <%=formUser && formUser.role==='receptionist' ? 'selected' : '' %>
                             >Receptionist</option>
                     </select>
                 </div>
                 <div class="mb-6">
                     <label class="block text-gray-700 text-sm font-bold mb-2">
-                        Password <%= user ? '(leave blank to keep unchanged)' : '' %>
+                        Password <%= formUser ? '(leave blank to keep unchanged)' : '' %>
                     </label>
                     <input type="password" name="password"
                         class="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                        <%=user ? '' : 'required' %>>
+                        <%=formUser ? '' : 'required' %>>
                 </div>
                 <div class="flex items-center justify-between">
                     <button type="submit"

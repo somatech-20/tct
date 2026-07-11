@@ -47,14 +47,14 @@ const notificationEmailReminder = async () => {
       }).join('\n');
       
       const emailContent = `
-Dear ${user.username},
+Dear ${user.fullName || user.username},
 
 You have ${notifications.length} unread notification(s) waiting for you:
 
 ${notificationList}
 
 Please log in to view them:
-${process.env.BASE_URL || 'http://localhost:3000'}/notifications
+${process.env.BASE_URL || 'https://tct-2zn2.onrender.com'}/notifications
 
 This is an automated reminder. Please check your notifications regularly.
       `;

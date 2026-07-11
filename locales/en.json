@@ -62,5 +62,6 @@
   "preferred_export_format": "Preferred Export Format",
   "default_export_format": "Default Export Format",
   "export": "Export",
-  "log_in": "Log In"
+  "log_in": "Log In",
+  "email": "Email"
 }
